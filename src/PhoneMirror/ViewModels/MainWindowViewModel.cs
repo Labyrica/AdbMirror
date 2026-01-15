@@ -16,6 +16,7 @@ namespace PhoneMirror.ViewModels;
 public partial class MainWindowViewModel : ViewModelBase, IDisposable
 {
     private readonly IAdbService _adbService;
+    private readonly IScrcpyService _scrcpyService;
     private readonly CancellationTokenSource _pollCts = new();
     private bool _disposed;
 
@@ -85,9 +86,14 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     /// Initializes a new instance of the MainWindowViewModel.
     /// </summary>
     /// <param name="adbService">The ADB service for device communication.</param>
-    public MainWindowViewModel(IAdbService adbService)
+    /// <param name="scrcpyService">The scrcpy service for screen mirroring.</param>
+    public MainWindowViewModel(IAdbService adbService, IScrcpyService scrcpyService)
     {
         _adbService = adbService ?? throw new ArgumentNullException(nameof(adbService));
+        _scrcpyService = scrcpyService ?? throw new ArgumentNullException(nameof(scrcpyService));
+
+        // Subscribe to mirroring stopped event
+        _scrcpyService.MirroringStopped += OnMirroringStopped;
 
         // Start initialization (fire-and-forget)
         _ = InitializeAsync();
@@ -156,12 +162,81 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             };
 
             // Update button enabled state based on device availability
-            // Only enable mirroring when a single device is connected
-            IsPrimaryEnabled = state == DeviceState.Connected || _isMirroring;
+            // Enable when connected, multiple devices (first one used), or currently mirroring
+            IsPrimaryEnabled = state == DeviceState.Connected || state == DeviceState.MultipleDevices || _isMirroring;
 
             // Notify that DeviceDisplayName may have changed
             OnPropertyChanged(nameof(DeviceDisplayName));
+
+            // Notify that CanMirror may have changed
+            MirrorCommand.NotifyCanExecuteChanged();
         });
+    }
+
+    // ========== Mirroring Event Handlers ==========
+
+    /// <summary>
+    /// Handles the MirroringStopped event from the scrcpy service.
+    /// </summary>
+    /// <param name="sender">The event sender.</param>
+    /// <param name="message">The exit message from scrcpy.</param>
+    private void OnMirroringStopped(object? sender, string message)
+    {
+        // Placeholder - will be fully implemented in Task 3
+    }
+
+    // ========== Mirroring Commands ==========
+
+    /// <summary>
+    /// Determines whether the mirror command can execute.
+    /// </summary>
+    /// <returns>True if mirroring can be started or stopped.</returns>
+    private bool CanMirror() => IsPrimaryEnabled;
+
+    /// <summary>
+    /// Toggles mirroring state - starts if not mirroring, stops if mirroring.
+    /// </summary>
+    [RelayCommand(CanExecute = nameof(CanMirror))]
+    private async Task MirrorAsync()
+    {
+        if (_isMirroring)
+        {
+            // Stop mirroring
+            _scrcpyService.StopMirroring();
+            _isMirroring = false;
+            PrimaryButtonText = "Mirror";
+        }
+        else
+        {
+            // Ensure we have a device serial
+            var serial = _currentDevice?.Serial;
+            if (string.IsNullOrEmpty(serial))
+            {
+                StatusText = "No device selected";
+                return;
+            }
+
+            // Start mirroring
+            _isMirroring = true;
+            PrimaryButtonText = "Stop";
+            StatusText = "Starting mirroring...";
+
+            var (success, error) = await _scrcpyService.StartMirroringAsync(
+                serial,
+                SelectedPreset,
+                keepScreenAwake: true);
+
+            if (!success)
+            {
+                _isMirroring = false;
+                PrimaryButtonText = "Mirror";
+                StatusText = error ?? "Failed to start mirroring";
+            }
+            else
+            {
+                StatusText = "Mirroring active";
+            }
+        }
     }
 
     /// <summary>
@@ -183,6 +258,9 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
         if (disposing)
         {
+            // Unsubscribe from events
+            _scrcpyService.MirroringStopped -= OnMirroringStopped;
+
             _pollCts.Cancel();
             _pollCts.Dispose();
         }
