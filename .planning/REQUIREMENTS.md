@@ -40,9 +40,9 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Error & Logging
 
 - [x] **LOGS-01**: App captures logcat errors during active mirroring session
-- [ ] **LOGS-02**: Main window has collapsible log panel (hidden by default)
-- [ ] **LOGS-03**: User can copy log contents to clipboard
-- [ ] **LOGS-04**: Error messages provide actionable guidance
+- [x] **LOGS-02**: Main window has collapsible log panel (hidden by default)
+- [x] **LOGS-03**: User can copy log contents to clipboard
+- [x] **LOGS-04**: Error messages provide actionable guidance
 
 ### Consumer UX
 
@@ -109,9 +109,9 @@ Which phases cover which requirements. Updated by create-roadmap.
 | CAPT-03 | Phase 4 | Complete |
 | CAPT-04 | Phase 4 | Complete |
 | LOGS-01 | Phase 4 | Complete |
-| LOGS-02 | Phase 5 | Pending |
-| LOGS-03 | Phase 5 | Pending |
-| LOGS-04 | Phase 5 | Pending |
+| LOGS-02 | Phase 5 | Complete |
+| LOGS-03 | Phase 5 | Complete |
+| LOGS-04 | Phase 5 | Complete |
 | UX-01 | Phase 1 | Complete |
 | UX-02 | Phase 3 | Complete |
 | UX-03 | Phase 3 | Complete |
@@ -123,4 +123,4 @@ Which phases cover which requirements. Updated by create-roadmap.
 
 ---
 *Requirements defined: 2026-01-15*
-*Last updated: 2026-01-15 after Phase 4 completion*
+*Last updated: 2026-01-15 after Phase 5 completion*

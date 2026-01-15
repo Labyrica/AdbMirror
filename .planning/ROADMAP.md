@@ -18,7 +18,7 @@ None
 - [x] **Phase 2: Core Services** - ADB/scrcpy services with cross-platform process handling
 - [x] **Phase 3: Mirror UI** - Main window with device list and mirroring controls
 - [x] **Phase 4: Capture Features** - Screenshot toolbar and session error capture
-- [ ] **Phase 5: Logging UI** - Collapsible log panel with copy functionality
+- [x] **Phase 5: Logging UI** - Collapsible log panel with copy functionality
 - [ ] **Phase 6: Packaging** - Platform-specific installers and distribution
 
 ## Phase Details
@@ -75,15 +75,16 @@ Plans:
 - [x] 04-02: Floating toolbar window (Wave 2)
 - [x] 04-03: Session logcat error capture (Wave 1)
 
-### Phase 5: Logging UI
+### Phase 5: Logging UI ✓
 **Goal**: Add collapsible log panel with copy functionality and error guidance
 **Depends on**: Phase 4
 **Requirements**: LOGS-02, LOGS-03, LOGS-04
 **Research**: Unlikely (internal UI patterns)
 **Plans**: 1 plan (1 wave)
+**Completed**: 2026-01-15
 
 Plans:
-- [ ] 05-01: Log panel with copy and actionable guidance (Wave 1)
+- [x] 05-01: Log panel with copy and actionable guidance (Wave 1)
 
 ### Phase 6: Packaging
 **Goal**: Create platform-specific installers for Windows, macOS, and Linux
@@ -109,5 +110,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Core Services | 4/4 | Complete | 2026-01-15 |
 | 3. Mirror UI | 4/4 | Complete | 2026-01-15 |
 | 4. Capture Features | 3/3 | Complete | 2026-01-15 |
-| 5. Logging UI | 0/1 | Planned | - |
+| 5. Logging UI | 1/1 | Complete | 2026-01-15 |
 | 6. Packaging | 0/3 | Not started | - |
