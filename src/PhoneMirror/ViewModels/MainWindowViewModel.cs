@@ -2,7 +2,9 @@ using System;
 using System.Collections.ObjectModel;
 using System.Threading;
 using System.Threading.Tasks;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using PhoneMirror.Core.Models;
 using PhoneMirror.Core.Services;
 
@@ -132,9 +134,34 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     /// <param name="device">The current device (if any).</param>
     private void OnDeviceStateChanged(DeviceState state, AndroidDevice? device)
     {
-        // Placeholder - will be fully implemented in Task 3
+        // Store state in private fields
         _currentState = state;
         _currentDevice = device;
+
+        // Update UI on the UI thread
+        Dispatcher.UIThread.Post(() =>
+        {
+            // Map DeviceState to user-friendly status text
+            StatusText = state switch
+            {
+                DeviceState.NoDevice => "No device connected",
+                DeviceState.Unauthorized => "Device unauthorized: check phone prompt",
+                DeviceState.Offline => "Device offline",
+                DeviceState.Connected => $"Device connected: {device?.DisplayName ?? "Unknown"}",
+                DeviceState.MultipleDevices => "Multiple devices connected",
+                DeviceState.AdbNotAvailable => "ADB not available",
+                DeviceState.ScrcpyNotAvailable => "scrcpy not available",
+                DeviceState.Mirroring => "Mirroring active",
+                _ => "Unknown state"
+            };
+
+            // Update button enabled state based on device availability
+            // Only enable mirroring when a single device is connected
+            IsPrimaryEnabled = state == DeviceState.Connected || _isMirroring;
+
+            // Notify that DeviceDisplayName may have changed
+            OnPropertyChanged(nameof(DeviceDisplayName));
+        });
     }
 
     /// <summary>
