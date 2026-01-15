@@ -182,7 +182,18 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     /// <param name="message">The exit message from scrcpy.</param>
     private void OnMirroringStopped(object? sender, string message)
     {
-        // Placeholder - will be fully implemented in Task 3
+        Dispatcher.UIThread.Post(() =>
+        {
+            // Reset mirroring state
+            _isMirroring = false;
+            PrimaryButtonText = "Mirror";
+
+            // Update status with exit message
+            StatusText = message;
+
+            // Re-evaluate device state to update button enabled state
+            OnDeviceStateChanged(_currentState, _currentDevice);
+        });
     }
 
     // ========== Mirroring Commands ==========
