@@ -15,7 +15,7 @@ None
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
 - [x] **Phase 1: Project Scaffold** - Avalonia solution setup with DI and theming
-- [ ] **Phase 2: Core Services** - ADB/scrcpy services with cross-platform process handling
+- [x] **Phase 2: Core Services** - ADB/scrcpy services with cross-platform process handling
 - [ ] **Phase 3: Mirror UI** - Main window with device list and mirroring controls
 - [ ] **Phase 4: Capture Features** - Screenshot toolbar and session error capture
 - [ ] **Phase 5: Logging UI** - Collapsible log panel with copy functionality
@@ -34,18 +34,19 @@ None
 Plans:
 - [x] 01-01: Solution setup with DI, ViewLocator, and dark theme
 
-### Phase 2: Core Services
+### Phase 2: Core Services ✓
 **Goal**: Migrate ADB and scrcpy services with cross-platform process management
 **Depends on**: Phase 1
 **Requirements**: PLAT-02, PLAT-03, CONN-01, CONN-02, CONN-03, CONN-04
 **Research**: Unlikely (migration patterns documented in PITFALLS.md)
-**Plans**: TBD
+**Plans**: 4 plans
+**Completed**: 2026-01-15
 
 Plans:
 - [x] 02-01: Platform abstraction and ProcessRunner
-- [ ] 02-02: AdbService migration with device detection
-- [ ] 02-03: ScrcpyService migration with quality presets
-- [ ] 02-04: Resource extraction for bundled binaries
+- [x] 02-02: AdbService migration with device detection
+- [x] 02-03: ScrcpyService migration with quality presets
+- [x] 02-04: Resource extraction for bundled binaries
 
 ### Phase 3: Mirror UI
 **Goal**: Convert main window with device list, controls, and settings
@@ -104,7 +105,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Project Scaffold | 1/1 | Complete | 2026-01-15 |
-| 2. Core Services | 1/4 | In progress | - |
+| 2. Core Services | 4/4 | Complete | 2026-01-15 |
 | 3. Mirror UI | 0/4 | Not started | - |
 | 4. Capture Features | 0/3 | Not started | - |
 | 5. Logging UI | 0/2 | Not started | - |
