@@ -5,6 +5,7 @@ using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using PhoneMirror.Core.Execution;
 using PhoneMirror.Core.Platform;
+using PhoneMirror.Core.Services;
 using PhoneMirror.ViewModels;
 using PhoneMirror.Views;
 
@@ -31,6 +32,10 @@ public partial class App : Application
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            // Initialize resource extraction (fire-and-forget for startup speed)
+            var resourceExtractor = Services.GetRequiredService<IResourceExtractor>();
+            _ = resourceExtractor.ExtractAllAsync();
+
             // Get MainWindowViewModel from DI container
             var mainViewModel = Services.GetRequiredService<MainWindowViewModel>();
 
@@ -38,6 +43,9 @@ public partial class App : Application
             {
                 DataContext = mainViewModel
             };
+
+            // Register cleanup on app exit
+            desktop.ShutdownRequested += (_, _) => resourceExtractor.Cleanup();
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -53,11 +61,14 @@ public partial class App : Application
         services.AddSingleton<IPlatformService, PlatformService>();
         services.AddSingleton<ProcessRunner>();
 
+        // Register resource extractor
+        services.AddSingleton<IResourceExtractor, ResourceExtractor>();
+
         // Register ViewModels
         services.AddSingleton<MainWindowViewModel>();
 
-        // Future: Register additional services from PhoneMirror.Core here
-        // services.AddSingleton<IAdbService, AdbService>();
-        // services.AddSingleton<IScrcpyService, ScrcpyService>();
+        // Register core services
+        services.AddSingleton<IAdbService, AdbService>();
+        services.AddSingleton<IScrcpyService, ScrcpyService>();
     }
 }
