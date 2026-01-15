@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-01-15)
 ## Current Position
 
 Phase: 2 of 6 (Core Services)
-Plan: 1/4 complete in current phase
+Plan: 3/4 complete in current phase
 Status: In progress
-Last activity: 2026-01-15 — Completed 02-01-PLAN.md
+Last activity: 2026-01-15 — Completed 02-03-PLAN.md
 
-Progress: ██░░░░░░░░ 12%
+Progress: ████░░░░░░ 24%
 
 ## Performance Metrics
 
@@ -45,6 +45,7 @@ Recent decisions affecting current work:
 - Phase 2: ProcessRunner uses async dual-stream pattern (PITFALLS.md)
 - Phase 2: IResourceExtractor async interface for cross-platform permission handling
 - Phase 2-01: Namespace PhoneMirror.Core.Execution (not Process) to avoid System.Diagnostics conflict
+- Phase 2-03: ScrcpyService uses Process directly (not ProcessRunner) for long-running process management
 
 ### Phase 2 Plan Structure
 
@@ -65,5 +66,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-15
-Stopped at: Completed 02-01-PLAN.md
+Stopped at: Completed 02-03-PLAN.md
 Resume file: None
