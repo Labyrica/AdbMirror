@@ -32,14 +32,14 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Capture & Clipboard
 
-- [ ] **CAPT-01**: User can capture device screenshot to clipboard via button
-- [ ] **CAPT-02**: Floating toolbar appears near mirror window during active session
-- [ ] **CAPT-03**: Floating toolbar has screenshot-to-clipboard button
-- [ ] **CAPT-04**: Floating toolbar has copy-recent-errors button (last 10 seconds)
+- [x] **CAPT-01**: User can capture device screenshot to clipboard via button
+- [x] **CAPT-02**: Floating toolbar appears near mirror window during active session
+- [x] **CAPT-03**: Floating toolbar has screenshot-to-clipboard button
+- [x] **CAPT-04**: Floating toolbar has copy-recent-errors button (last 10 seconds)
 
 ### Error & Logging
 
-- [ ] **LOGS-01**: App captures logcat errors during active mirroring session
+- [x] **LOGS-01**: App captures logcat errors during active mirroring session
 - [ ] **LOGS-02**: Main window has collapsible log panel (hidden by default)
 - [ ] **LOGS-03**: User can copy log contents to clipboard
 - [ ] **LOGS-04**: Error messages provide actionable guidance
@@ -104,11 +104,11 @@ Which phases cover which requirements. Updated by create-roadmap.
 | MIRR-05 | Phase 3 | Complete |
 | MIRR-06 | Phase 3 | Complete |
 | MIRR-07 | Phase 3 | Complete |
-| CAPT-01 | Phase 4 | Pending |
-| CAPT-02 | Phase 4 | Pending |
-| CAPT-03 | Phase 4 | Pending |
-| CAPT-04 | Phase 4 | Pending |
-| LOGS-01 | Phase 4 | Pending |
+| CAPT-01 | Phase 4 | Complete |
+| CAPT-02 | Phase 4 | Complete |
+| CAPT-03 | Phase 4 | Complete |
+| CAPT-04 | Phase 4 | Complete |
+| LOGS-01 | Phase 4 | Complete |
 | LOGS-02 | Phase 5 | Pending |
 | LOGS-03 | Phase 5 | Pending |
 | LOGS-04 | Phase 5 | Pending |
@@ -123,4 +123,4 @@ Which phases cover which requirements. Updated by create-roadmap.
 
 ---
 *Requirements defined: 2026-01-15*
-*Last updated: 2026-01-15 after Phase 3 completion*
+*Last updated: 2026-01-15 after Phase 4 completion*
