@@ -8,15 +8,31 @@
         x:DataType="vm:MainWindowViewModel"
         Title="Phone Mirror"
         Width="400"
-        Height="600">
+        Height="600"
+        Background="{DynamicResource ApplicationBackgroundBrush}">
 
     <Design.DataContext>
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <TextBlock Text="Phone Mirror"
-               HorizontalAlignment="Center"
-               VerticalAlignment="Center"
-               FontSize="24"/>
+    <Grid RowDefinitions="Auto,*">
+        <!-- Header -->
+        <Border Grid.Row="0"
+                Padding="16"
+                Background="{DynamicResource CardBackgroundFillColorDefaultBrush}">
+            <TextBlock Text="Phone Mirror"
+                       FontSize="24"
+                       FontWeight="SemiBold"
+                       HorizontalAlignment="Center"/>
+        </Border>
+
+        <!-- Content area placeholder -->
+        <TextBlock Grid.Row="1"
+                   Text="Ready to connect"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                   FontSize="14"/>
+    </Grid>
 
 </Window>

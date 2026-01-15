@@ -1,12 +1,12 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="using:PhoneMirror"
-             x:Class="PhoneMirror.App"
-             RequestedThemeVariant="Dark">
+             xmlns:ui="using:FluentAvalonia.Styling"
+             x:Class="PhoneMirror.App">
     <Application.DataTemplates>
         <local:ViewLocator/>
     </Application.DataTemplates>
     <Application.Styles>
-        <FluentTheme />
+        <ui:FluentAvaloniaTheme RequestedTheme="Dark" />
     </Application.Styles>
 </Application>
