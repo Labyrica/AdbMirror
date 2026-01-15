@@ -1,0 +1,79 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:PhoneMirror.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="150" d:DesignHeight="60"
+        x:Class="PhoneMirror.Views.FloatingToolbar"
+        x:DataType="vm:FloatingToolbarViewModel"
+        Title="Toolbar"
+        Width="150"
+        Height="60"
+        CanResize="False"
+        SystemDecorations="None"
+        Topmost="True"
+        ShowInTaskbar="False"
+        Background="Transparent">
+
+    <Design.DataContext>
+        <vm:FloatingToolbarViewModel/>
+    </Design.DataContext>
+
+    <!-- Main container with rounded corners and semi-transparent dark background -->
+    <Border Background="#CC2D2D2D"
+            CornerRadius="8"
+            Padding="8"
+            BorderBrush="#55FFFFFF"
+            BorderThickness="1">
+        <Grid RowDefinitions="Auto,Auto">
+            <!-- Button row -->
+            <StackPanel Grid.Row="0"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Center"
+                        Spacing="12">
+                <!-- Screenshot button -->
+                <Button Command="{Binding ScreenshotCommand}"
+                        ToolTip.Tip="Screenshot to clipboard"
+                        Width="40"
+                        Height="32"
+                        Padding="0"
+                        HorizontalContentAlignment="Center"
+                        VerticalContentAlignment="Center"
+                        Background="#44FFFFFF"
+                        BorderThickness="0">
+                    <TextBlock Text="&#xE722;"
+                               FontFamily="{StaticResource SymbolThemeFontFamily}"
+                               FontSize="16"
+                               Foreground="White"/>
+                </Button>
+
+                <!-- Copy errors button -->
+                <Button Command="{Binding CopyErrorsCommand}"
+                        ToolTip.Tip="Copy recent errors"
+                        Width="40"
+                        Height="32"
+                        Padding="0"
+                        HorizontalContentAlignment="Center"
+                        VerticalContentAlignment="Center"
+                        Background="#44FFFFFF"
+                        BorderThickness="0">
+                    <TextBlock Text="&#xE7BA;"
+                               FontFamily="{StaticResource SymbolThemeFontFamily}"
+                               FontSize="16"
+                               Foreground="White"/>
+                </Button>
+            </StackPanel>
+
+            <!-- Status message -->
+            <TextBlock Grid.Row="1"
+                       Text="{Binding StatusMessage}"
+                       FontSize="10"
+                       Foreground="#BBFFFFFF"
+                       HorizontalAlignment="Center"
+                       Margin="0,4,0,0"
+                       MaxWidth="130"
+                       TextTrimming="CharacterEllipsis"/>
+        </Grid>
+    </Border>
+
+</Window>
