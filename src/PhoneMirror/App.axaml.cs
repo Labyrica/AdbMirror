@@ -77,5 +77,7 @@ public partial class App : Application
         // Register core services
         services.AddSingleton<IAdbService, AdbService>();
         services.AddSingleton<IScrcpyService, ScrcpyService>();
+        services.AddSingleton<IScreenshotService, ScreenshotService>();
+        services.AddSingleton<ILogcatService, LogcatService>();
     }
 }
