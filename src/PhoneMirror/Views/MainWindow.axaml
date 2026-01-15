@@ -1,6 +1,8 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:PhoneMirror.ViewModels"
+        xmlns:converters="using:PhoneMirror.Converters"
+        xmlns:core="using:PhoneMirror.Core.Services"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="760" d:DesignHeight="460"
@@ -13,6 +15,10 @@
         MinHeight="380"
         CanResize="True"
         Background="{DynamicResource ApplicationPageBackgroundThemeBrush}">
+
+    <Window.Resources>
+        <converters:LogLevelToBrushConverter x:Key="LogLevelToBrushConverter"/>
+    </Window.Resources>
 
     <Design.DataContext>
         <vm:MainWindowViewModel/>
@@ -73,24 +79,143 @@
                                MaxWidth="380"/>
                 </StackPanel>
 
-                <!-- Log panel placeholder (full implementation in Phase 5) -->
+                <!-- Log panel header with toggle -->
+                <Border Grid.Row="4"
+                        Margin="0,4,0,0"
+                        Padding="8,6"
+                        Background="{DynamicResource CardBackgroundFillColorSecondaryBrush}"
+                        CornerRadius="4,4,0,0"
+                        IsVisible="{Binding !IsLogPanelExpanded}">
+                    <Button Command="{Binding ToggleLogPanelCommand}"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Padding="0"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Left"
+                            Cursor="Hand">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE70E;"
+                                       FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                       FontSize="10"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                       Margin="0,0,6,0"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Text="EVENT LOG"
+                                       FontSize="10"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding LogEntryCountText}"
+                                       FontSize="10"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                       Margin="6,0,0,0"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </Border>
+
+                <!-- Log panel expanded content -->
                 <Border Grid.Row="4"
                         Margin="0,4,0,0"
                         Padding="8"
                         Background="{DynamicResource CardBackgroundFillColorSecondaryBrush}"
-                        CornerRadius="4">
+                        CornerRadius="4"
+                        IsVisible="{Binding IsLogPanelExpanded}"
+                        MaxHeight="200">
                     <Grid RowDefinitions="Auto,*">
-                        <TextBlock Grid.Row="0"
-                                   Text="EVENT LOG"
-                                   FontSize="10"
-                                   FontWeight="SemiBold"
-                                   Foreground="{DynamicResource TextFillColorTertiaryBrush}"
-                                   Margin="0,0,0,8"/>
-                        <TextBlock Grid.Row="1"
-                                   Text="Logs will appear here..."
-                                   FontSize="10"
-                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                   FontFamily="Consolas"/>
+                        <!-- Header with toggle and action buttons -->
+                        <DockPanel Grid.Row="0" LastChildFill="False" Margin="0,0,0,8">
+                            <Button DockPanel.Dock="Left"
+                                    Command="{Binding ToggleLogPanelCommand}"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Padding="0"
+                                    Cursor="Hand">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE70D;"
+                                               FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                               FontSize="10"
+                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                               Margin="0,0,6,0"
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Text="EVENT LOG"
+                                               FontSize="10"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding LogEntryCountText}"
+                                               FontSize="10"
+                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                               Margin="6,0,0,0"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Action buttons -->
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="4">
+                                <Button Command="{Binding CopyLogsCommand}"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Padding="4"
+                                        ToolTip.Tip="Copy logs to clipboard">
+                                    <TextBlock Text="&#xE8C8;"
+                                               FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                               FontSize="12"
+                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                </Button>
+                                <Button Command="{Binding ClearLogsCommand}"
+                                        Background="Transparent"
+                                        BorderThickness="0"
+                                        Padding="4"
+                                        ToolTip.Tip="Clear logs">
+                                    <TextBlock Text="&#xE74D;"
+                                               FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                               FontSize="12"
+                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                                </Button>
+                            </StackPanel>
+                        </DockPanel>
+
+                        <!-- Log entries list -->
+                        <ScrollViewer Grid.Row="1"
+                                      HorizontalScrollBarVisibility="Auto"
+                                      VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding LogEntries}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="core:LogcatEntry">
+                                        <StackPanel Orientation="Horizontal" Margin="0,1">
+                                            <TextBlock Text="{Binding Timestamp, StringFormat={}{0:HH:mm:ss.fff}}"
+                                                       FontSize="10"
+                                                       FontFamily="Consolas"
+                                                       Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                                       Margin="0,0,8,0"
+                                                       VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding Level}"
+                                                       FontSize="10"
+                                                       FontFamily="Consolas"
+                                                       FontWeight="Bold"
+                                                       Foreground="{Binding Level, Converter={StaticResource LogLevelToBrushConverter}}"
+                                                       Margin="0,0,8,0"
+                                                       VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding Tag}"
+                                                       FontSize="10"
+                                                       FontFamily="Consolas"
+                                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                                       Margin="0,0,8,0"
+                                                       VerticalAlignment="Center"
+                                                       MaxWidth="100"
+                                                       TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Text="{Binding Message}"
+                                                       FontSize="10"
+                                                       FontFamily="Consolas"
+                                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                                       VerticalAlignment="Center"
+                                                       TextWrapping="NoWrap"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
                     </Grid>
                 </Border>
             </Grid>

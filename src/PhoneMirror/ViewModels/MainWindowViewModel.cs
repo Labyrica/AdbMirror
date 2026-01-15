@@ -1,11 +1,14 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Input.Platform;
 using Avalonia.Platform;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -28,6 +31,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     private readonly ISettingsService _settings;
     private readonly CancellationTokenSource _pollCts = new();
     private FloatingToolbar? _floatingToolbar;
+    private DispatcherTimer? _logPollTimer;
     private bool _disposed;
 
     /// <summary>
@@ -163,6 +167,25 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             }
         }
     }
+
+    // ========== Log Panel Properties ==========
+
+    /// <summary>
+    /// Whether the log panel is expanded.
+    /// </summary>
+    [ObservableProperty]
+    private bool _isLogPanelExpanded;
+
+    /// <summary>
+    /// Collection of log entries displayed in the log panel.
+    /// </summary>
+    [ObservableProperty]
+    private ObservableCollection<LogcatEntry> _logEntries = new();
+
+    /// <summary>
+    /// Gets the log entry count text for display in the header.
+    /// </summary>
+    public string LogEntryCountText => LogEntries.Count > 0 ? $"({LogEntries.Count})" : "";
 
     /// <summary>
     /// Initializes a new instance of the MainWindowViewModel.
@@ -305,9 +328,14 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             _isMirroring = false;
             PrimaryButtonText = "Mirror";
 
-            // Stop logcat capture and close toolbar
+            // Stop logcat capture, log polling, and close toolbar
+            StopLogPolling();
             _logcatService.StopCapture();
             CloseFloatingToolbar();
+
+            // Clear log entries
+            LogEntries.Clear();
+            OnPropertyChanged(nameof(LogEntryCountText));
 
             // Update status with exit message
             StatusText = message;
@@ -338,9 +366,14 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             _isMirroring = false;
             PrimaryButtonText = "Mirror";
 
-            // Stop logcat capture and close toolbar
+            // Stop logcat capture, log polling, and close toolbar
+            StopLogPolling();
             _logcatService.StopCapture();
             CloseFloatingToolbar();
+
+            // Clear log entries
+            LogEntries.Clear();
+            OnPropertyChanged(nameof(LogEntryCountText));
         }
         else
         {
@@ -375,6 +408,9 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
                 // Start logcat capture for error monitoring
                 await _logcatService.StartCaptureAsync(serial);
+
+                // Start log polling for UI updates
+                StartLogPolling();
 
                 // Show floating toolbar
                 ShowFloatingToolbar(serial);
@@ -423,6 +459,116 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     {
         _floatingToolbar?.Close();
         _floatingToolbar = null;
+    }
+
+    // ========== Log Panel Commands ==========
+
+    /// <summary>
+    /// Toggles the log panel expanded state.
+    /// </summary>
+    [RelayCommand]
+    private void ToggleLogPanel() => IsLogPanelExpanded = !IsLogPanelExpanded;
+
+    /// <summary>
+    /// Copies all log entries to the clipboard.
+    /// </summary>
+    [RelayCommand]
+    private async Task CopyLogsAsync()
+    {
+        if (LogEntries.Count == 0)
+        {
+            StatusText = "No logs to copy";
+            return;
+        }
+
+        var text = FormatLogsForClipboard(LogEntries);
+        var clipboard = GetClipboard();
+        if (clipboard != null)
+        {
+            await clipboard.SetTextAsync(text);
+            StatusText = $"Copied {LogEntries.Count} log entries to clipboard";
+        }
+    }
+
+    /// <summary>
+    /// Clears all log entries.
+    /// </summary>
+    [RelayCommand]
+    private void ClearLogs()
+    {
+        LogEntries.Clear();
+        _logcatService.ClearErrors();
+        OnPropertyChanged(nameof(LogEntryCountText));
+    }
+
+    /// <summary>
+    /// Formats log entries for clipboard copy.
+    /// </summary>
+    private static string FormatLogsForClipboard(IEnumerable<LogcatEntry> entries)
+    {
+        var sb = new StringBuilder();
+        foreach (var entry in entries)
+        {
+            sb.AppendLine($"{entry.Timestamp:HH:mm:ss.fff} [{entry.Level}] {entry.Tag}: {entry.Message}");
+        }
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// Gets the clipboard from the application.
+    /// </summary>
+    private static IClipboard? GetClipboard()
+    {
+        return Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
+            ? desktop.MainWindow?.Clipboard
+            : null;
+    }
+
+    /// <summary>
+    /// Starts the log polling timer to update log entries from logcat service.
+    /// </summary>
+    private void StartLogPolling()
+    {
+        _logPollTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromMilliseconds(500)
+        };
+        _logPollTimer.Tick += OnLogPollTick;
+        _logPollTimer.Start();
+    }
+
+    /// <summary>
+    /// Stops the log polling timer.
+    /// </summary>
+    private void StopLogPolling()
+    {
+        if (_logPollTimer != null)
+        {
+            _logPollTimer.Tick -= OnLogPollTick;
+            _logPollTimer.Stop();
+            _logPollTimer = null;
+        }
+    }
+
+    /// <summary>
+    /// Handles the log poll timer tick to update log entries.
+    /// </summary>
+    private void OnLogPollTick(object? sender, EventArgs e)
+    {
+        var allErrors = _logcatService.GetAllSessionErrors();
+        var currentCount = LogEntries.Count;
+
+        // Only add new entries
+        for (var i = currentCount; i < allErrors.Count; i++)
+        {
+            LogEntries.Add(allErrors[i]);
+        }
+
+        // Notify count changed if entries were added
+        if (LogEntries.Count != currentCount)
+        {
+            OnPropertyChanged(nameof(LogEntryCountText));
+        }
     }
 
     // ========== Screenshot Commands ==========
@@ -505,6 +651,9 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
         if (disposing)
         {
+            // Stop log polling timer
+            StopLogPolling();
+
             // Close floating toolbar if open
             CloseFloatingToolbar();
 
