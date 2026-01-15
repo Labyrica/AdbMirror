@@ -17,7 +17,7 @@ None
 - [x] **Phase 1: Project Scaffold** - Avalonia solution setup with DI and theming
 - [x] **Phase 2: Core Services** - ADB/scrcpy services with cross-platform process handling
 - [x] **Phase 3: Mirror UI** - Main window with device list and mirroring controls
-- [ ] **Phase 4: Capture Features** - Screenshot toolbar and session error capture
+- [x] **Phase 4: Capture Features** - Screenshot toolbar and session error capture
 - [ ] **Phase 5: Logging UI** - Collapsible log panel with copy functionality
 - [ ] **Phase 6: Packaging** - Platform-specific installers and distribution
 
@@ -62,16 +62,17 @@ Plans:
 - [x] 03-03: Mirroring controls and quality selector (Wave 2)
 - [x] 03-04: Settings persistence and options panel (Wave 3)
 
-### Phase 4: Capture Features
+### Phase 4: Capture Features ✓
 **Goal**: Add screenshot to clipboard and session error capture
 **Depends on**: Phase 3
 **Requirements**: CAPT-01, CAPT-02, CAPT-03, CAPT-04, LOGS-01
 **Research**: Unlikely (ADB screencap and logcat are standard APIs)
 **Plans**: 3 plans (2 waves)
+**Completed**: 2026-01-15
 
 Plans:
 - [x] 04-01: ADB screenshot to clipboard (Wave 1)
-- [ ] 04-02: Floating toolbar window (Wave 2)
+- [x] 04-02: Floating toolbar window (Wave 2)
 - [x] 04-03: Session logcat error capture (Wave 1)
 
 ### Phase 5: Logging UI
@@ -108,6 +109,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. Project Scaffold | 1/1 | Complete | 2026-01-15 |
 | 2. Core Services | 4/4 | Complete | 2026-01-15 |
 | 3. Mirror UI | 4/4 | Complete | 2026-01-15 |
-| 4. Capture Features | 2/3 | In progress | - |
+| 4. Capture Features | 3/3 | Complete | 2026-01-15 |
 | 5. Logging UI | 0/2 | Not started | - |
 | 6. Packaging | 0/3 | Not started | - |
