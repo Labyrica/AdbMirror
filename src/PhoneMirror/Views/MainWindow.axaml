@@ -25,8 +25,75 @@
                 Padding="16"
                 Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
                 CornerRadius="8">
-            <TextBlock Text="Left panel placeholder"
-                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+            <Grid RowDefinitions="Auto,Auto,Auto,8,*">
+                <!-- Header -->
+                <DockPanel Grid.Row="0" LastChildFill="False" Margin="0,0,0,12">
+                    <StackPanel Orientation="Vertical" DockPanel.Dock="Left" VerticalAlignment="Top">
+                        <TextBlock Text="Phone Mirror"
+                                   FontSize="20"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
+                        <TextBlock Text="Live ADB mirroring"
+                                   FontSize="11"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+                    </StackPanel>
+                </DockPanel>
+
+                <!-- Status line -->
+                <StackPanel Grid.Row="1"
+                            Orientation="Horizontal"
+                            Margin="0,0,0,4">
+                    <TextBlock Text="STATUS"
+                               FontSize="10"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                               Margin="0,0,8,0"
+                               VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding StatusText}"
+                               FontSize="12"
+                               Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                               MaxWidth="360"
+                               TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+
+                <!-- ADB path info -->
+                <StackPanel Grid.Row="2"
+                            Orientation="Horizontal"
+                            Margin="0,0,0,4">
+                    <TextBlock Text="ADB"
+                               FontSize="10"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                               Margin="0,0,8,0"
+                               VerticalAlignment="Top"/>
+                    <TextBlock Text="{Binding AdbPathText}"
+                               FontSize="10"
+                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                               TextWrapping="Wrap"
+                               MaxWidth="380"/>
+                </StackPanel>
+
+                <!-- Log panel placeholder (full implementation in Phase 5) -->
+                <Border Grid.Row="4"
+                        Margin="0,4,0,0"
+                        Padding="8"
+                        Background="{DynamicResource CardBackgroundFillColorSecondaryBrush}"
+                        CornerRadius="4">
+                    <Grid RowDefinitions="Auto,*">
+                        <TextBlock Grid.Row="0"
+                                   Text="EVENT LOG"
+                                   FontSize="10"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                   Margin="0,0,0,8"/>
+                        <TextBlock Grid.Row="1"
+                                   Text="Logs will appear here..."
+                                   FontSize="10"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   FontFamily="Consolas"/>
+                    </Grid>
+                </Border>
+            </Grid>
         </Border>
 
         <!-- RIGHT: Controls -->
