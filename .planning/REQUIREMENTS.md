@@ -10,15 +10,15 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Platform
 
 - [x] **PLAT-01**: App runs on Windows, macOS, and Linux via Avalonia UI
-- [ ] **PLAT-02**: App bundles ADB and scrcpy for zero-setup experience
-- [ ] **PLAT-03**: App handles platform-specific binary extraction and permissions
+- [x] **PLAT-02**: App bundles ADB and scrcpy for zero-setup experience
+- [x] **PLAT-03**: App handles platform-specific binary extraction and permissions
 
 ### Device Connection
 
-- [ ] **CONN-01**: App detects USB-connected Android devices automatically
-- [ ] **CONN-02**: App displays device authorization guidance when device is unauthorized
-- [ ] **CONN-03**: App shows device state (connected/disconnected/unauthorized/error)
-- [ ] **CONN-04**: App displays friendly device name (model) instead of serial number
+- [x] **CONN-01**: App detects USB-connected Android devices automatically
+- [x] **CONN-02**: App displays device authorization guidance when device is unauthorized
+- [x] **CONN-03**: App shows device state (connected/disconnected/unauthorized/error)
+- [x] **CONN-04**: App displays friendly device name (model) instead of serial number
 
 ### Mirroring Control
 
@@ -91,12 +91,12 @@ Which phases cover which requirements. Updated by create-roadmap.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | PLAT-01 | Phase 1 | Complete |
-| PLAT-02 | Phase 2 | Pending |
-| PLAT-03 | Phase 2 | Pending |
-| CONN-01 | Phase 2 | Pending |
-| CONN-02 | Phase 2 | Pending |
-| CONN-03 | Phase 2 | Pending |
-| CONN-04 | Phase 2 | Pending |
+| PLAT-02 | Phase 2 | Complete |
+| PLAT-03 | Phase 2 | Complete |
+| CONN-01 | Phase 2 | Complete |
+| CONN-02 | Phase 2 | Complete |
+| CONN-03 | Phase 2 | Complete |
+| CONN-04 | Phase 2 | Complete |
 | MIRR-01 | Phase 3 | Pending |
 | MIRR-02 | Phase 3 | Pending |
 | MIRR-03 | Phase 3 | Pending |
@@ -123,4 +123,4 @@ Which phases cover which requirements. Updated by create-roadmap.
 
 ---
 *Requirements defined: 2026-01-15*
-*Last updated: 2026-01-15 after roadmap creation*
+*Last updated: 2026-01-15 after Phase 2 completion*
