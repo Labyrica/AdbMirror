@@ -38,5 +38,8 @@ nul
 AdbMirror/Resources/
 Resources/
 
+# PhoneMirror embedded resource ZIPs (download separately)
+src/PhoneMirror.Core/Resources/*.zip
+
 
 

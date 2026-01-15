@@ -6,4 +6,14 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <!-- Embedded resources for bundled binaries (optional at build time) -->
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\platform-tools.zip" Condition="Exists('Resources\platform-tools.zip')">
+      <LogicalName>PhoneMirror.Core.Resources.platform-tools.zip</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\scrcpy.zip" Condition="Exists('Resources\scrcpy.zip')">
+      <LogicalName>PhoneMirror.Core.Resources.scrcpy.zip</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>
