@@ -1,7 +1,10 @@
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -17,6 +20,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 {
     private readonly IAdbService _adbService;
     private readonly IScrcpyService _scrcpyService;
+    private readonly IScreenshotService _screenshotService;
     private readonly ISettingsService _settings;
     private readonly CancellationTokenSource _pollCts = new();
     private bool _disposed;
@@ -160,11 +164,17 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     /// </summary>
     /// <param name="adbService">The ADB service for device communication.</param>
     /// <param name="scrcpyService">The scrcpy service for screen mirroring.</param>
+    /// <param name="screenshotService">The screenshot service for capturing device screen.</param>
     /// <param name="settingsService">The settings service for persisting user preferences.</param>
-    public MainWindowViewModel(IAdbService adbService, IScrcpyService scrcpyService, ISettingsService settingsService)
+    public MainWindowViewModel(
+        IAdbService adbService,
+        IScrcpyService scrcpyService,
+        IScreenshotService screenshotService,
+        ISettingsService settingsService)
     {
         _adbService = adbService ?? throw new ArgumentNullException(nameof(adbService));
         _scrcpyService = scrcpyService ?? throw new ArgumentNullException(nameof(scrcpyService));
+        _screenshotService = screenshotService ?? throw new ArgumentNullException(nameof(screenshotService));
         _settings = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
 
         // Initialize all properties from persisted settings
@@ -255,8 +265,9 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             // Notify that DeviceDisplayName may have changed
             OnPropertyChanged(nameof(DeviceDisplayName));
 
-            // Notify that CanMirror may have changed
+            // Notify that CanMirror and CanScreenshot may have changed
             MirrorCommand.NotifyCanExecuteChanged();
+            ScreenshotCommand.NotifyCanExecuteChanged();
 
             // Auto-mirror when device connects (if enabled and not already auto-mirrored)
             if (state == DeviceState.Connected &&
@@ -346,6 +357,67 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             {
                 StatusText = "Mirroring active";
             }
+        }
+    }
+
+    // ========== Screenshot Commands ==========
+
+    /// <summary>
+    /// Determines whether the screenshot command can execute.
+    /// </summary>
+    /// <returns>True if a device is connected.</returns>
+    private bool CanScreenshot() => _currentDevice != null;
+
+    /// <summary>
+    /// Captures a screenshot from the device and copies it to the clipboard.
+    /// </summary>
+    [RelayCommand(CanExecute = nameof(CanScreenshot))]
+    private async Task ScreenshotAsync()
+    {
+        var serial = _currentDevice?.Serial;
+        if (string.IsNullOrEmpty(serial))
+        {
+            StatusText = "No device connected";
+            return;
+        }
+
+        StatusText = "Capturing screenshot...";
+
+        var (pngData, error) = await _screenshotService.CaptureAsync(serial);
+
+        if (pngData == null || error != null)
+        {
+            StatusText = error ?? "Screenshot capture failed";
+            return;
+        }
+
+        // Save screenshot to temp file and copy to clipboard
+        // Note: Avalonia clipboard bitmap support is limited, so we save to file
+        // and copy the file path to clipboard as a reliable fallback
+        try
+        {
+            // Save to temp file
+            var tempPath = Path.Combine(Path.GetTempPath(), $"PhoneMirror_Screenshot_{DateTime.Now:yyyyMMdd_HHmmss}.png");
+            await File.WriteAllBytesAsync(tempPath, pngData);
+
+            var clipboard = Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
+                ? desktop.MainWindow?.Clipboard
+                : null;
+
+            if (clipboard != null)
+            {
+                // Copy file path as text so user knows where it is
+                await clipboard.SetTextAsync(tempPath);
+                StatusText = $"Screenshot saved and path copied: {Path.GetFileName(tempPath)}";
+            }
+            else
+            {
+                StatusText = $"Screenshot saved to: {tempPath}";
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusText = $"Screenshot save error: {ex.Message}";
         }
     }
 
