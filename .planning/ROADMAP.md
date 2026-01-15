@@ -94,7 +94,7 @@ Plans:
 **Plans**: 3 plans (2 waves)
 
 Plans:
-- [ ] 06-01: Resource embedding and Windows packaging (Wave 1)
+- [x] 06-01: Resource embedding and Windows packaging (Wave 1)
 - [ ] 06-02: macOS app bundle with signing (Wave 2, depends: 06-01)
 - [ ] 06-03: Linux AppImage (Wave 2, depends: 06-01)
 
@@ -110,4 +110,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 3. Mirror UI | 4/4 | Complete | 2026-01-15 |
 | 4. Capture Features | 3/3 | Complete | 2026-01-15 |
 | 5. Logging UI | 1/1 | Complete | 2026-01-15 |
-| 6. Packaging | 0/3 | Not started | - |
+| 6. Packaging | 1/3 | In progress | - |

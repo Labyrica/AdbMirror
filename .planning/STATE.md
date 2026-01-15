@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-15)
 
 **Core value:** One-click mirroring that just works — no installation guides, no terminal commands, no hunting for drivers.
-**Current focus:** Phase 5 — Logging UI (COMPLETE)
+**Current focus:** Phase 6 — Packaging (IN PROGRESS)
 
 ## Current Position
 
-Phase: 5 of 6 (Logging UI)
-Plan: 1 of 1 in current phase
-Status: Phase complete
-Last activity: 2026-01-15 — Completed 05-01-PLAN.md
+Phase: 6 of 6 (Packaging)
+Plan: 1 of 3 in current phase
+Status: In progress
+Last activity: 2026-01-15 — Completed 06-01-PLAN.md
 
-Progress: █████████████░ 83%
+Progress: ██████████████░ 87%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
+- Total plans completed: 14
 - Average duration: 8min
-- Total execution time: ~108min
+- Total execution time: ~114min
 
 **By Phase:**
 
@@ -32,9 +32,10 @@ Progress: █████████████░ 83%
 | 3 | 4/4 | ~30min | ~7.5min |
 | 4 | 3/3 | ~25min | ~8.3min |
 | 5 | 1/1 | ~8min | ~8min |
+| 6 | 1/3 | ~6min | ~6min |
 
 **Recent Trend:**
-- Last 5 plans: 03-04, 04-03, 04-01, 04-02, 05-01
+- Last 5 plans: 04-01, 04-02, 04-03, 05-01, 06-01
 - Trend: Stable
 
 ## Accumulated Context
@@ -61,6 +62,8 @@ Recent decisions affecting current work:
 - Phase 4-02: Toolbar positioned on right edge of primary screen, vertically centered
 - Phase 4-02: DispatcherTimer for 2-second auto-clearing status messages
 - Phase 5-01: Log panel hidden by default, 500ms polling interval for log updates
+- Phase 6-01: Conditional EmbeddedResource for optional binaries at build time
+- Phase 6-01: Self-contained single-file deployment (~44MB executable)
 
 ### Pending Todos
 
@@ -73,22 +76,19 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-15
-Stopped at: Completed 05-01-PLAN.md
+Stopped at: Completed 06-01-PLAN.md
 Resume file: None
 
-## Phase 5 Summary (COMPLETE)
+## Phase 6 Progress (IN PROGRESS)
 
-**Wave 1:** 05-01 (log panel) — COMPLETE
+**Wave 1:** 06-01 (resource embedding + Windows) — COMPLETE
 
-Plan 05-01 delivers:
-- Collapsible log panel in MainWindow (hidden by default)
-- Real-time logcat error display via DispatcherTimer polling
-- LogLevelToBrushConverter for color-coded log levels
-- Copy to clipboard with formatted output
-- Clear logs functionality (UI and service buffer)
-- Entry count badge in panel header
+Plan 06-01 delivers:
+- Embedded resource configuration for platform-tools.zip and scrcpy.zip
+- prepare-resources.ps1 script for creating ZIP bundles
+- publish-windows.ps1 script for Windows x64 deployment
+- Self-contained single-file executable (~44MB)
 
-Requirements completed:
-- LOGS-02: Collapsible log panel
-- LOGS-03: Copy log contents to clipboard
-- LOGS-04: Error messages with color-coded levels
+**Remaining:**
+- 06-02: macOS app bundle with signing (Wave 2)
+- 06-03: Linux AppImage (Wave 2)
