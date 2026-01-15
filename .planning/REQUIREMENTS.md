@@ -90,37 +90,37 @@ Which phases cover which requirements. Updated by create-roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PLAT-01 | — | Pending |
-| PLAT-02 | — | Pending |
-| PLAT-03 | — | Pending |
-| CONN-01 | — | Pending |
-| CONN-02 | — | Pending |
-| CONN-03 | — | Pending |
-| CONN-04 | — | Pending |
-| MIRR-01 | — | Pending |
-| MIRR-02 | — | Pending |
-| MIRR-03 | — | Pending |
-| MIRR-04 | — | Pending |
-| MIRR-05 | — | Pending |
-| MIRR-06 | — | Pending |
-| MIRR-07 | — | Pending |
-| CAPT-01 | — | Pending |
-| CAPT-02 | — | Pending |
-| CAPT-03 | — | Pending |
-| CAPT-04 | — | Pending |
-| LOGS-01 | — | Pending |
-| LOGS-02 | — | Pending |
-| LOGS-03 | — | Pending |
-| LOGS-04 | — | Pending |
-| UX-01 | — | Pending |
-| UX-02 | — | Pending |
-| UX-03 | — | Pending |
+| PLAT-01 | Phase 1 | Pending |
+| PLAT-02 | Phase 2 | Pending |
+| PLAT-03 | Phase 2 | Pending |
+| CONN-01 | Phase 2 | Pending |
+| CONN-02 | Phase 2 | Pending |
+| CONN-03 | Phase 2 | Pending |
+| CONN-04 | Phase 2 | Pending |
+| MIRR-01 | Phase 3 | Pending |
+| MIRR-02 | Phase 3 | Pending |
+| MIRR-03 | Phase 3 | Pending |
+| MIRR-04 | Phase 3 | Pending |
+| MIRR-05 | Phase 3 | Pending |
+| MIRR-06 | Phase 3 | Pending |
+| MIRR-07 | Phase 3 | Pending |
+| CAPT-01 | Phase 4 | Pending |
+| CAPT-02 | Phase 4 | Pending |
+| CAPT-03 | Phase 4 | Pending |
+| CAPT-04 | Phase 4 | Pending |
+| LOGS-01 | Phase 4 | Pending |
+| LOGS-02 | Phase 5 | Pending |
+| LOGS-03 | Phase 5 | Pending |
+| LOGS-04 | Phase 5 | Pending |
+| UX-01 | Phase 1 | Pending |
+| UX-02 | Phase 3 | Pending |
+| UX-03 | Phase 3 | Pending |
 
 **Coverage:**
 - v1 requirements: 25 total
-- Mapped to phases: 0
-- Unmapped: 25 ⚠️
+- Mapped to phases: 25
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-01-15*
-*Last updated: 2026-01-15 after initial definition*
+*Last updated: 2026-01-15 after roadmap creation*
