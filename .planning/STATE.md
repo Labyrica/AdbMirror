@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-15)
 ## Current Position
 
 Phase: 4 of 6 (Capture Features)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In progress
-Last activity: 2026-01-15 — Completed 04-03-PLAN.md
+Last activity: 2026-01-15 — Completed 04-01-PLAN.md
 
-Progress: ██████████░ 59%
+Progress: ███████████░ 65%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
+- Total plans completed: 11
 - Average duration: 8min
-- Total execution time: ~80min
+- Total execution time: ~92min
 
 **By Phase:**
 
@@ -30,10 +30,10 @@ Progress: ██████████░ 59%
 | 1 | 1/1 | — | — |
 | 2 | 4/4 | ~40min | ~10min |
 | 3 | 4/4 | ~30min | ~7.5min |
-| 4 | 1/3 | ~5min | ~5min |
+| 4 | 2/3 | ~17min | ~8.5min |
 
 **Recent Trend:**
-- Last 5 plans: 03-01, 03-02, 03-03, 03-04, 04-03
+- Last 5 plans: 03-02, 03-03, 03-04, 04-03, 04-01
 - Trend: Stable
 
 ## Accumulated Context
@@ -56,6 +56,7 @@ Recent decisions affecting current work:
 - Phase 3-04: Settings auto-save on property change for immediate persistence
 - Phase 3-04: Track last auto-mirrored serial to prevent repeated triggers
 - Phase 4-03: ConcurrentQueue for thread-safe circular buffer in LogcatService
+- Phase 4-01: Save screenshot to temp file (Avalonia clipboard bitmap support limited)
 
 ### Pending Todos
 
@@ -68,13 +69,19 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-15
-Stopped at: Completed 04-03-PLAN.md
+Stopped at: Completed 04-01-PLAN.md
 Resume file: None
 
 ## Phase 4 Progress
 
-**Wave 1:** 04-01 (screenshot), 04-03 (logcat) — 04-03 COMPLETE
+**Wave 1:** 04-01 (screenshot), 04-03 (logcat) — COMPLETE
 **Wave 2:** 04-02 (floating toolbar)
+
+Plan 04-01 delivers:
+- IScreenshotService interface for ADB screen capture
+- ScreenshotService using exec-out screencap -p
+- ScreenshotCommand saving to temp folder, path to clipboard
+- Screenshot button in MainWindow UI
 
 Plan 04-03 delivers:
 - ILogcatService interface for session-scoped error capture
