@@ -42,7 +42,7 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 02-01: Platform abstraction and ProcessRunner
+- [x] 02-01: Platform abstraction and ProcessRunner
 - [ ] 02-02: AdbService migration with device detection
 - [ ] 02-03: ScrcpyService migration with quality presets
 - [ ] 02-04: Resource extraction for bundled binaries
@@ -104,7 +104,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Project Scaffold | 1/1 | Complete | 2026-01-15 |
-| 2. Core Services | 0/4 | Not started | - |
+| 2. Core Services | 1/4 | In progress | - |
 | 3. Mirror UI | 0/4 | Not started | - |
 | 4. Capture Features | 0/3 | Not started | - |
 | 5. Logging UI | 0/2 | Not started | - |
