@@ -97,6 +97,59 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         }
     }
 
+    // ========== Settings Checkbox Properties ==========
+
+    private bool _autoMirrorOnConnect;
+
+    /// <summary>
+    /// Gets or sets whether to automatically start mirroring when a device connects.
+    /// </summary>
+    public bool AutoMirrorOnConnect
+    {
+        get => _autoMirrorOnConnect;
+        set
+        {
+            if (SetProperty(ref _autoMirrorOnConnect, value))
+            {
+                _settings.AutoMirrorOnConnect = value;
+            }
+        }
+    }
+
+    private bool _startFullscreen;
+
+    /// <summary>
+    /// Gets or sets whether to start scrcpy in fullscreen mode.
+    /// </summary>
+    public bool StartFullscreen
+    {
+        get => _startFullscreen;
+        set
+        {
+            if (SetProperty(ref _startFullscreen, value))
+            {
+                _settings.StartFullscreen = value;
+            }
+        }
+    }
+
+    private bool _keepScreenAwake;
+
+    /// <summary>
+    /// Gets or sets whether to keep the device screen awake during mirroring.
+    /// </summary>
+    public bool KeepScreenAwake
+    {
+        get => _keepScreenAwake;
+        set
+        {
+            if (SetProperty(ref _keepScreenAwake, value))
+            {
+                _settings.KeepScreenAwake = value;
+            }
+        }
+    }
+
     /// <summary>
     /// Initializes a new instance of the MainWindowViewModel.
     /// </summary>
@@ -109,8 +162,11 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         _scrcpyService = scrcpyService ?? throw new ArgumentNullException(nameof(scrcpyService));
         _settings = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
 
-        // Initialize preset from persisted settings
+        // Initialize all properties from persisted settings
         _selectedPreset = _settings.DefaultPreset;
+        _autoMirrorOnConnect = _settings.AutoMirrorOnConnect;
+        _startFullscreen = _settings.StartFullscreen;
+        _keepScreenAwake = _settings.KeepScreenAwake;
 
         // Subscribe to mirroring stopped event
         _scrcpyService.MirroringStopped += OnMirroringStopped;
