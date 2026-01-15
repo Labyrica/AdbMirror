@@ -14,7 +14,7 @@ None
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 1: Project Scaffold** - Avalonia solution setup with DI and theming
+- [x] **Phase 1: Project Scaffold** - Avalonia solution setup with DI and theming
 - [ ] **Phase 2: Core Services** - ADB/scrcpy services with cross-platform process handling
 - [ ] **Phase 3: Mirror UI** - Main window with device list and mirroring controls
 - [ ] **Phase 4: Capture Features** - Screenshot toolbar and session error capture
@@ -23,17 +23,16 @@ None
 
 ## Phase Details
 
-### Phase 1: Project Scaffold
+### Phase 1: Project Scaffold ✓
 **Goal**: Create new Avalonia solution with recommended stack (DI, FluentAvaloniaUI dark theme)
 **Depends on**: Nothing (first phase)
 **Requirements**: PLAT-01, UX-01
 **Research**: Unlikely (established Avalonia patterns, research already complete)
-**Plans**: TBD
+**Plans**: 1 plan
+**Completed**: 2026-01-15
 
 Plans:
-- [ ] 01-01: Solution setup with Avalonia and Core projects
-- [ ] 01-02: DI container and ViewLocator configuration
-- [ ] 01-03: FluentAvaloniaUI dark theme integration
+- [x] 01-01: Solution setup with DI, ViewLocator, and dark theme
 
 ### Phase 2: Core Services
 **Goal**: Migrate ADB and scrcpy services with cross-platform process management
@@ -104,7 +103,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Project Scaffold | 0/3 | Not started | - |
+| 1. Project Scaffold | 1/1 | Complete | 2026-01-15 |
 | 2. Core Services | 0/4 | Not started | - |
 | 3. Mirror UI | 0/4 | Not started | - |
 | 4. Capture Features | 0/3 | Not started | - |

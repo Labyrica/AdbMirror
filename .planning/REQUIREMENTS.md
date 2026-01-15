@@ -9,7 +9,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Platform
 
-- [ ] **PLAT-01**: App runs on Windows, macOS, and Linux via Avalonia UI
+- [x] **PLAT-01**: App runs on Windows, macOS, and Linux via Avalonia UI
 - [ ] **PLAT-02**: App bundles ADB and scrcpy for zero-setup experience
 - [ ] **PLAT-03**: App handles platform-specific binary extraction and permissions
 
@@ -46,7 +46,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Consumer UX
 
-- [ ] **UX-01**: App uses dark theme (Lab visual identity)
+- [x] **UX-01**: App uses dark theme (Lab visual identity)
 - [ ] **UX-02**: App persists user settings between sessions
 - [ ] **UX-03**: UI is simplified with reduced visible complexity
 
@@ -90,7 +90,7 @@ Which phases cover which requirements. Updated by create-roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PLAT-01 | Phase 1 | Pending |
+| PLAT-01 | Phase 1 | Complete |
 | PLAT-02 | Phase 2 | Pending |
 | PLAT-03 | Phase 2 | Pending |
 | CONN-01 | Phase 2 | Pending |
@@ -112,7 +112,7 @@ Which phases cover which requirements. Updated by create-roadmap.
 | LOGS-02 | Phase 5 | Pending |
 | LOGS-03 | Phase 5 | Pending |
 | LOGS-04 | Phase 5 | Pending |
-| UX-01 | Phase 1 | Pending |
+| UX-01 | Phase 1 | Complete |
 | UX-02 | Phase 3 | Pending |
 | UX-03 | Phase 3 | Pending |
 
