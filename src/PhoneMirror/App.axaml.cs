@@ -3,6 +3,8 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
+using PhoneMirror.Core.Execution;
+using PhoneMirror.Core.Platform;
 using PhoneMirror.ViewModels;
 using PhoneMirror.Views;
 
@@ -47,10 +49,14 @@ public partial class App : Application
     /// <param name="services">The service collection to configure.</param>
     private static void ConfigureServices(IServiceCollection services)
     {
+        // Register platform services
+        services.AddSingleton<IPlatformService, PlatformService>();
+        services.AddSingleton<ProcessRunner>();
+
         // Register ViewModels
         services.AddSingleton<MainWindowViewModel>();
 
-        // Future: Register services from PhoneMirror.Core here
+        // Future: Register additional services from PhoneMirror.Core here
         // services.AddSingleton<IAdbService, AdbService>();
         // services.AddSingleton<IScrcpyService, ScrcpyService>();
     }
