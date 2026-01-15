@@ -23,7 +23,7 @@ public partial class App : Application
         AvaloniaXamlLoader.Load(this);
     }
 
-    public override void OnFrameworkInitializationCompleted()
+    public override async void OnFrameworkInitializationCompleted()
     {
         // Configure dependency injection
         var services = new ServiceCollection();
@@ -32,6 +32,10 @@ public partial class App : Application
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            // Load settings early in startup
+            var settingsService = Services.GetRequiredService<ISettingsService>();
+            await settingsService.LoadAsync();
+
             // Initialize resource extraction (fire-and-forget for startup speed)
             var resourceExtractor = Services.GetRequiredService<IResourceExtractor>();
             _ = resourceExtractor.ExtractAllAsync();
@@ -63,6 +67,9 @@ public partial class App : Application
 
         // Register resource extractor
         services.AddSingleton<IResourceExtractor, ResourceExtractor>();
+
+        // Register settings service
+        services.AddSingleton<ISettingsService, SettingsService>();
 
         // Register ViewModels
         services.AddSingleton<MainWindowViewModel>();

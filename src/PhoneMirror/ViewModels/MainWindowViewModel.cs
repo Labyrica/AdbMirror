@@ -17,6 +17,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 {
     private readonly IAdbService _adbService;
     private readonly IScrcpyService _scrcpyService;
+    private readonly ISettingsService _settings;
     private readonly CancellationTokenSource _pollCts = new();
     private bool _disposed;
 
@@ -79,18 +80,37 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     /// <summary>
     /// The currently selected quality preset.
     /// </summary>
-    [ObservableProperty]
-    private ScrcpyPreset _selectedPreset = ScrcpyPreset.Balanced;
+    private ScrcpyPreset _selectedPreset;
+
+    /// <summary>
+    /// Gets or sets the currently selected quality preset.
+    /// </summary>
+    public ScrcpyPreset SelectedPreset
+    {
+        get => _selectedPreset;
+        set
+        {
+            if (SetProperty(ref _selectedPreset, value))
+            {
+                _settings.DefaultPreset = value;
+            }
+        }
+    }
 
     /// <summary>
     /// Initializes a new instance of the MainWindowViewModel.
     /// </summary>
     /// <param name="adbService">The ADB service for device communication.</param>
     /// <param name="scrcpyService">The scrcpy service for screen mirroring.</param>
-    public MainWindowViewModel(IAdbService adbService, IScrcpyService scrcpyService)
+    /// <param name="settingsService">The settings service for persisting user preferences.</param>
+    public MainWindowViewModel(IAdbService adbService, IScrcpyService scrcpyService, ISettingsService settingsService)
     {
         _adbService = adbService ?? throw new ArgumentNullException(nameof(adbService));
         _scrcpyService = scrcpyService ?? throw new ArgumentNullException(nameof(scrcpyService));
+        _settings = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
+
+        // Initialize preset from persisted settings
+        _selectedPreset = _settings.DefaultPreset;
 
         // Subscribe to mirroring stopped event
         _scrcpyService.MirroringStopped += OnMirroringStopped;
