@@ -11,7 +11,10 @@ namespace PhoneMirror.Core.Services;
 public sealed class ScrcpyService : IScrcpyService
 {
     private readonly IPlatformService _platformService;
+    private readonly IResourceExtractor? _resourceExtractor;
+    private readonly SemaphoreSlim _resolveLock = new(1, 1);
     private string? _scrcpyPath;
+    private bool _pathResolved;
     private Process? _currentProcess;
 
     /// <inheritdoc />
@@ -27,18 +30,18 @@ public sealed class ScrcpyService : IScrcpyService
     /// Initializes a new instance of the <see cref="ScrcpyService"/> class.
     /// </summary>
     /// <param name="platformService">The platform service for cross-platform operations.</param>
-    public ScrcpyService(IPlatformService platformService)
+    /// <param name="resourceExtractor">Optional resource extractor for embedded scrcpy.</param>
+    public ScrcpyService(IPlatformService platformService, IResourceExtractor? resourceExtractor = null)
     {
         _platformService = platformService;
-        _scrcpyPath = ResolveScrcpyPath();
+        _resourceExtractor = resourceExtractor;
     }
 
     /// <inheritdoc />
-    public Task<bool> IsAvailableAsync()
+    public async Task<bool> IsAvailableAsync()
     {
-        // Re-resolve path in case environment changed
-        _scrcpyPath = ResolveScrcpyPath();
-        return Task.FromResult(_scrcpyPath != null && File.Exists(_scrcpyPath));
+        var path = await ResolveScrcpyPathAsync().ConfigureAwait(false);
+        return !string.IsNullOrEmpty(path) && File.Exists(path);
     }
 
     /// <inheritdoc />
@@ -52,8 +55,11 @@ public sealed class ScrcpyService : IScrcpyService
         // Clean up any existing session
         StopMirroring();
 
+        // Resolve scrcpy path (waits for extraction if needed)
+        var scrcpyPath = await ResolveScrcpyPathAsync().ConfigureAwait(false);
+
         // Check availability
-        if (!await IsAvailableAsync())
+        if (string.IsNullOrEmpty(scrcpyPath) || !File.Exists(scrcpyPath))
         {
             var executableName = "scrcpy" + _platformService.ExecutableExtension;
             return (false, $"scrcpy not found. Please ensure {executableName} is available in the application directory or in PATH.");
@@ -63,7 +69,7 @@ public sealed class ScrcpyService : IScrcpyService
 
         var psi = new ProcessStartInfo
         {
-            FileName = _scrcpyPath!,
+            FileName = scrcpyPath,
             Arguments = args,
             UseShellExecute = false,
             RedirectStandardError = true,
@@ -72,7 +78,7 @@ public sealed class ScrcpyService : IScrcpyService
             StandardOutputEncoding = Encoding.UTF8,
             StandardErrorEncoding = Encoding.UTF8,
             // WorkingDirectory must be set to the scrcpy directory for DLL dependencies
-            WorkingDirectory = Path.GetDirectoryName(Path.GetFullPath(_scrcpyPath!)) ?? AppContext.BaseDirectory
+            WorkingDirectory = Path.GetDirectoryName(Path.GetFullPath(scrcpyPath)) ?? AppContext.BaseDirectory
         };
 
         try
@@ -166,7 +172,7 @@ public sealed class ScrcpyService : IScrcpyService
         }
         catch (Exception ex)
         {
-            return (false, $"Failed to start scrcpy: {ex.Message}\nPath: {_scrcpyPath}\nArgs: {args}");
+            return (false, $"Failed to start scrcpy: {ex.Message}\nPath: {scrcpyPath}\nArgs: {args}");
         }
     }
 
@@ -204,33 +210,75 @@ public sealed class ScrcpyService : IScrcpyService
     }
 
     /// <summary>
+    /// Resolves the scrcpy path asynchronously, waiting for resource extraction if needed.
+    /// </summary>
+    private async Task<string?> ResolveScrcpyPathAsync()
+    {
+        if (_pathResolved)
+        {
+            return _scrcpyPath;
+        }
+
+        await _resolveLock.WaitAsync().ConfigureAwait(false);
+        try
+        {
+            if (_pathResolved)
+            {
+                return _scrcpyPath;
+            }
+
+            string? extractedPath = null;
+            if (_resourceExtractor != null)
+            {
+                extractedPath = await _resourceExtractor.GetScrcpyPathAsync().ConfigureAwait(false);
+            }
+
+            _scrcpyPath = ResolveScrcpyPathSync(extractedPath);
+            _pathResolved = true;
+            return _scrcpyPath;
+        }
+        finally
+        {
+            _resolveLock.Release();
+        }
+    }
+
+    /// <summary>
     /// Resolves the path to the scrcpy executable.
     /// </summary>
+    /// <param name="extractedPath">Path from resource extractor, if available.</param>
     /// <returns>The resolved path, or null if not found.</returns>
-    private string? ResolveScrcpyPath()
+    private string? ResolveScrcpyPathSync(string? extractedPath)
     {
         var executableName = "scrcpy" + _platformService.ExecutableExtension;
         var candidates = new List<string>();
 
+        // 1. Check embedded resources first (highest priority)
+        if (!string.IsNullOrEmpty(extractedPath) && File.Exists(extractedPath))
+        {
+            return extractedPath;
+        }
+
         var baseDir = AppContext.BaseDirectory;
 
-        // Check bundled locations (relative to application)
+        // 2. Check bundled locations (relative to application)
         candidates.Add(Path.Combine(baseDir, "scrcpy", executableName));
         candidates.Add(Path.Combine(baseDir, executableName));
 
-        // Check application data directory (extracted resources location)
+        // 3. Check application data directory (extracted resources location)
         var appDataPath = _platformService.GetAppDataPath();
         candidates.Add(Path.Combine(appDataPath, "scrcpy", executableName));
 
-        // Check parent directories (for development scenarios like bin\Debug\net8.0)
+        // 4. Check parent directories (for development scenarios like bin\Debug\net8.0)
         var currentDir = Directory.GetParent(baseDir);
-        for (int i = 0; i < 5 && currentDir != null; i++)
+        for (int i = 0; i < 8 && currentDir != null; i++)
         {
+            candidates.Add(Path.Combine(currentDir.FullName, "src", "PhoneMirror.Core", "Resources", "scrcpy", executableName));
             candidates.Add(Path.Combine(currentDir.FullName, "scrcpy", executableName));
             currentDir = currentDir.Parent;
         }
 
-        // Check PATH directories
+        // 5. Check PATH directories
         var pathEnv = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
         var separator = _platformService.CurrentPlatform == System.Runtime.InteropServices.OSPlatform.Windows
             ? ';'

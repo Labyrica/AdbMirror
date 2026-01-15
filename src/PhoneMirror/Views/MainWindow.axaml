@@ -5,16 +5,16 @@
         xmlns:core="using:PhoneMirror.Core.Services"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="760" d:DesignHeight="460"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="520"
         x:Class="PhoneMirror.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="Phone Mirror"
-        Width="760"
-        Height="460"
-        MinWidth="640"
-        MinHeight="380"
+        Width="800"
+        Height="520"
+        MinWidth="720"
+        MinHeight="480"
         CanResize="True"
-        Background="{DynamicResource ApplicationPageBackgroundThemeBrush}">
+        Background="{StaticResource LabyricaBackgroundBrush}">
 
     <Window.Resources>
         <converters:LogLevelToBrushConverter x:Key="LogLevelToBrushConverter"/>
@@ -24,331 +24,295 @@
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <Grid ColumnDefinitions="2.2*,1.4*">
-        <!-- LEFT: Status + logs -->
-        <Border Grid.Column="0"
-                Margin="24,24,16,24"
-                Padding="16"
-                Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
-                CornerRadius="8">
-            <Grid RowDefinitions="Auto,Auto,Auto,8,*">
-                <!-- Header -->
-                <DockPanel Grid.Row="0" LastChildFill="False" Margin="0,0,0,12">
-                    <StackPanel Orientation="Vertical" DockPanel.Dock="Left" VerticalAlignment="Top">
-                        <TextBlock Text="Phone Mirror"
-                                   FontSize="20"
-                                   FontWeight="SemiBold"
-                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"/>
-                        <TextBlock Text="Live ADB mirroring"
-                                   FontSize="11"
-                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
-                    </StackPanel>
-                </DockPanel>
+    <!-- Main container with proper padding -->
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-                <!-- Status line -->
-                <StackPanel Grid.Row="1"
-                            Orientation="Horizontal"
-                            Margin="0,0,0,4">
-                    <TextBlock Text="STATUS"
-                               FontSize="10"
-                               FontWeight="SemiBold"
-                               Foreground="{DynamicResource TextFillColorTertiaryBrush}"
-                               Margin="0,0,8,0"
-                               VerticalAlignment="Center"/>
-                    <TextBlock Text="{Binding StatusText}"
-                               FontSize="12"
-                               Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                               MaxWidth="360"
-                               TextTrimming="CharacterEllipsis"/>
-                </StackPanel>
+        <!-- Header with logo and title -->
+        <DockPanel Grid.Row="0" Margin="0,0,0,20">
+            <Image Source="/Assets/labyrica-logo.png"
+                   Height="20"
+                   DockPanel.Dock="Left"
+                   VerticalAlignment="Center"
+                   Opacity="0.8"/>
+            <TextBlock Text="PHONE MIRROR"
+                       FontSize="20"
+                       FontWeight="SemiBold"
+                       Foreground="{StaticResource LabyricaTextPrimaryBrush}"
+                       LetterSpacing="3"
+                       Margin="16,0,0,0"
+                       VerticalAlignment="Center"/>
+            <TextBlock Text="labyrica.com"
+                       FontSize="11"
+                       Foreground="{StaticResource LabyricaTextSecondaryBrush}"
+                       DockPanel.Dock="Right"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Center"/>
+        </DockPanel>
 
-                <!-- ADB path info -->
-                <StackPanel Grid.Row="2"
-                            Orientation="Horizontal"
-                            Margin="0,0,0,4">
-                    <TextBlock Text="ADB"
-                               FontSize="10"
-                               FontWeight="SemiBold"
-                               Foreground="{DynamicResource TextFillColorTertiaryBrush}"
-                               Margin="0,0,8,0"
-                               VerticalAlignment="Top"/>
-                    <TextBlock Text="{Binding AdbPathText}"
-                               FontSize="10"
-                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                               TextWrapping="Wrap"
-                               MaxWidth="380"/>
-                </StackPanel>
+        <!-- Main content area -->
+        <Grid Grid.Row="1" ColumnDefinitions="1.6*,24,1*">
 
-                <!-- Log panel header with toggle -->
-                <Border Grid.Row="4"
-                        Margin="0,4,0,0"
-                        Padding="8,6"
-                        Background="{DynamicResource CardBackgroundFillColorSecondaryBrush}"
-                        CornerRadius="4,4,0,0"
-                        IsVisible="{Binding !IsLogPanelExpanded}">
-                    <Button Command="{Binding ToggleLogPanelCommand}"
-                            Background="Transparent"
-                            BorderThickness="0"
-                            Padding="0"
-                            HorizontalAlignment="Stretch"
-                            HorizontalContentAlignment="Left"
-                            Cursor="Hand">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="&#xE70E;"
-                                       FontFamily="{StaticResource SymbolThemeFontFamily}"
-                                       FontSize="10"
-                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                       Margin="0,0,6,0"
-                                       VerticalAlignment="Center"/>
-                            <TextBlock Text="EVENT LOG"
+            <!-- LEFT PANEL: Status + Logs -->
+            <Border Grid.Column="0"
+                    Padding="20"
+                    Background="{StaticResource LabyricaSurfaceBrush}"
+                    BorderBrush="{StaticResource LabyricaBorderPrimaryBrush}"
+                    BorderThickness="1"
+                    CornerRadius="{StaticResource LabyricaCornerRadius}">
+                <Grid RowDefinitions="Auto,16,Auto,16,*">
+
+                    <!-- Status Section -->
+                    <StackPanel Grid.Row="0" Orientation="Vertical">
+                        <Border Background="#19FFFFFF" Padding="8,4" CornerRadius="2" HorizontalAlignment="Left" Margin="0,0,0,8">
+                            <TextBlock Text="STATUS"
                                        FontSize="10"
                                        FontWeight="SemiBold"
-                                       Foreground="{DynamicResource TextFillColorTertiaryBrush}"
-                                       VerticalAlignment="Center"/>
-                            <TextBlock Text="{Binding LogEntryCountText}"
-                                       FontSize="10"
-                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                       Margin="6,0,0,0"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-                </Border>
+                                       Foreground="{StaticResource LabyricaTextAccentBrush}"
+                                       LetterSpacing="1"/>
+                        </Border>
+                        <TextBlock Text="{Binding StatusText}"
+                                   FontSize="13"
+                                   Foreground="{StaticResource LabyricaTextPrimaryBrush}"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
 
-                <!-- Log panel expanded content -->
-                <Border Grid.Row="4"
-                        Margin="0,4,0,0"
-                        Padding="8"
-                        Background="{DynamicResource CardBackgroundFillColorSecondaryBrush}"
-                        CornerRadius="4"
-                        IsVisible="{Binding IsLogPanelExpanded}"
-                        MaxHeight="200">
-                    <Grid RowDefinitions="Auto,*">
-                        <!-- Header with toggle and action buttons -->
-                        <DockPanel Grid.Row="0" LastChildFill="False" Margin="0,0,0,8">
-                            <Button DockPanel.Dock="Left"
-                                    Command="{Binding ToggleLogPanelCommand}"
-                                    Background="Transparent"
-                                    BorderThickness="0"
-                                    Padding="0"
-                                    Cursor="Hand">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#xE70D;"
-                                               FontFamily="{StaticResource SymbolThemeFontFamily}"
-                                               FontSize="10"
-                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                               Margin="0,0,6,0"
-                                               VerticalAlignment="Center"/>
-                                    <TextBlock Text="EVENT LOG"
-                                               FontSize="10"
-                                               FontWeight="SemiBold"
-                                               Foreground="{DynamicResource TextFillColorTertiaryBrush}"
-                                               VerticalAlignment="Center"/>
+                    <!-- ADB Info Section -->
+                    <StackPanel Grid.Row="2" Orientation="Vertical">
+                        <Border Background="#19FFFFFF" Padding="8,4" CornerRadius="2" HorizontalAlignment="Left" Margin="0,0,0,8">
+                            <TextBlock Text="ADB PATH"
+                                       FontSize="10"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource LabyricaTextAccentBrush}"
+                                       LetterSpacing="1"/>
+                        </Border>
+                        <TextBlock Text="{Binding AdbPathText}"
+                                   FontSize="11"
+                                   Foreground="{StaticResource LabyricaTextSecondaryBrush}"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+
+                    <!-- Log Panel -->
+                    <Border Grid.Row="4"
+                            Background="{StaticResource LabyricaBackgroundBrush}"
+                            BorderBrush="{StaticResource LabyricaBorderPrimaryBrush}"
+                            BorderThickness="1"
+                            CornerRadius="{StaticResource LabyricaCornerRadiusSm}"
+                            Padding="12">
+                        <Grid RowDefinitions="Auto,8,*">
+                            <!-- Log Header -->
+                            <DockPanel Grid.Row="0" LastChildFill="False">
+                                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                                    <Button Command="{Binding ToggleLogPanelCommand}"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            Padding="0"
+                                            Cursor="Hand">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding IsLogPanelExpanded, Converter={x:Static converters:BoolConverters.ToChevron}}"
+                                                       FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                                       FontSize="10"
+                                                       Foreground="{StaticResource LabyricaTextSecondaryBrush}"
+                                                       Margin="0,0,6,0"
+                                                       VerticalAlignment="Center"/>
+                                            <TextBlock Text="EVENT LOG"
+                                                       FontSize="10"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{StaticResource LabyricaTextAccentBrush}"
+                                                       VerticalAlignment="Center"
+                                                       LetterSpacing="1"/>
+                                        </StackPanel>
+                                    </Button>
                                     <TextBlock Text="{Binding LogEntryCountText}"
                                                FontSize="10"
-                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                               Margin="6,0,0,0"
+                                               Foreground="{StaticResource LabyricaTextSecondaryBrush}"
+                                               Margin="8,0,0,0"
                                                VerticalAlignment="Center"/>
                                 </StackPanel>
-                            </Button>
 
-                            <!-- Action buttons -->
-                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="4">
-                                <Button Command="{Binding CopyLogsCommand}"
-                                        Background="Transparent"
-                                        BorderThickness="0"
-                                        Padding="4"
-                                        ToolTip.Tip="Copy logs to clipboard">
-                                    <TextBlock Text="&#xE8C8;"
-                                               FontFamily="{StaticResource SymbolThemeFontFamily}"
-                                               FontSize="12"
-                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
-                                </Button>
-                                <Button Command="{Binding ClearLogsCommand}"
-                                        Background="Transparent"
-                                        BorderThickness="0"
-                                        Padding="4"
-                                        ToolTip.Tip="Clear logs">
-                                    <TextBlock Text="&#xE74D;"
-                                               FontFamily="{StaticResource SymbolThemeFontFamily}"
-                                               FontSize="12"
-                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
-                                </Button>
-                            </StackPanel>
-                        </DockPanel>
+                                <!-- Action buttons -->
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="4">
+                                    <Button Command="{Binding CopyLogsCommand}"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            Padding="6"
+                                            ToolTip.Tip="Copy logs">
+                                        <TextBlock Text="&#xE8C8;"
+                                                   FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                                   FontSize="12"
+                                                   Foreground="{StaticResource LabyricaTextSecondaryBrush}"/>
+                                    </Button>
+                                    <Button Command="{Binding ClearLogsCommand}"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            Padding="6"
+                                            ToolTip.Tip="Clear logs">
+                                        <TextBlock Text="&#xE74D;"
+                                                   FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                                   FontSize="12"
+                                                   Foreground="{StaticResource LabyricaTextSecondaryBrush}"/>
+                                    </Button>
+                                </StackPanel>
+                            </DockPanel>
 
-                        <!-- Log entries list -->
-                        <ScrollViewer Grid.Row="1"
-                                      HorizontalScrollBarVisibility="Auto"
-                                      VerticalScrollBarVisibility="Auto">
-                            <ItemsControl ItemsSource="{Binding LogEntries}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate x:DataType="core:LogcatEntry">
-                                        <StackPanel Orientation="Horizontal" Margin="0,1">
-                                            <TextBlock Text="{Binding Timestamp, StringFormat={}{0:HH:mm:ss.fff}}"
-                                                       FontSize="10"
-                                                       FontFamily="Consolas"
-                                                       Foreground="{DynamicResource TextFillColorTertiaryBrush}"
-                                                       Margin="0,0,8,0"
-                                                       VerticalAlignment="Center"/>
-                                            <TextBlock Text="{Binding Level}"
-                                                       FontSize="10"
-                                                       FontFamily="Consolas"
-                                                       FontWeight="Bold"
-                                                       Foreground="{Binding Level, Converter={StaticResource LogLevelToBrushConverter}}"
-                                                       Margin="0,0,8,0"
-                                                       VerticalAlignment="Center"/>
-                                            <TextBlock Text="{Binding Tag}"
-                                                       FontSize="10"
-                                                       FontFamily="Consolas"
-                                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                                       Margin="0,0,8,0"
-                                                       VerticalAlignment="Center"
-                                                       MaxWidth="100"
-                                                       TextTrimming="CharacterEllipsis"/>
-                                            <TextBlock Text="{Binding Message}"
-                                                       FontSize="10"
-                                                       FontFamily="Consolas"
-                                                       Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                                       VerticalAlignment="Center"
-                                                       TextWrapping="NoWrap"/>
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
-                    </Grid>
-                </Border>
-            </Grid>
-        </Border>
+                            <!-- Log entries -->
+                            <ScrollViewer Grid.Row="2"
+                                          IsVisible="{Binding IsLogPanelExpanded}"
+                                          HorizontalScrollBarVisibility="Auto"
+                                          VerticalScrollBarVisibility="Auto">
+                                <ItemsControl ItemsSource="{Binding LogEntries}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="core:LogcatEntry">
+                                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                <TextBlock Text="{Binding Timestamp, StringFormat={}{0:HH:mm:ss}}"
+                                                           FontSize="10"
+                                                           FontFamily="Consolas"
+                                                           Foreground="{StaticResource LabyricaTextAccentBrush}"
+                                                           Margin="0,0,8,0"/>
+                                                <TextBlock Text="{Binding Level}"
+                                                           FontSize="10"
+                                                           FontFamily="Consolas"
+                                                           FontWeight="Bold"
+                                                           Foreground="{Binding Level, Converter={StaticResource LogLevelToBrushConverter}}"
+                                                           Margin="0,0,8,0"
+                                                           Width="16"/>
+                                                <TextBlock Text="{Binding Message}"
+                                                           FontSize="10"
+                                                           FontFamily="Consolas"
+                                                           Foreground="{StaticResource LabyricaTextPrimaryBrush}"
+                                                           TextWrapping="NoWrap"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
 
-        <!-- RIGHT: Controls -->
-        <Border Grid.Column="1"
-                Margin="0,24,24,24"
-                Padding="16"
-                Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
-                CornerRadius="8">
-            <Grid RowDefinitions="Auto,Auto,Auto,*,Auto">
-                <!-- Device summary -->
-                <StackPanel Grid.Row="0"
-                            Orientation="Vertical"
-                            Margin="0,0,0,16">
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                        <TextBlock Text="&#xE8EA;"
-                                   FontFamily="{StaticResource SymbolThemeFontFamily}"
-                                   FontSize="16"
-                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                                   Margin="0,0,8,0"
-                                   VerticalAlignment="Center"/>
-                        <TextBlock Text="DEVICE"
+            <!-- RIGHT PANEL: Controls -->
+            <Border Grid.Column="2"
+                    Padding="20"
+                    Background="{StaticResource LabyricaSurfaceBrush}"
+                    BorderBrush="{StaticResource LabyricaBorderPrimaryBrush}"
+                    BorderThickness="1"
+                    CornerRadius="{StaticResource LabyricaCornerRadius}">
+                <Grid RowDefinitions="Auto,20,Auto,12,Auto,24,Auto,*">
+
+                    <!-- Device Info -->
+                    <StackPanel Grid.Row="0" Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="&#xE8EA;"
+                                       FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                       FontSize="14"
+                                       Foreground="{StaticResource LabyricaTextPrimaryBrush}"
+                                       Margin="0,0,8,0"
+                                       VerticalAlignment="Center"/>
+                            <Border Background="#19FFFFFF" Padding="8,4" CornerRadius="2">
+                                <TextBlock Text="DEVICE"
+                                           FontSize="10"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource LabyricaTextAccentBrush}"
+                                           LetterSpacing="1"/>
+                            </Border>
+                        </StackPanel>
+                        <TextBlock Text="{Binding DeviceDisplayName}"
+                                   FontSize="12"
+                                   Foreground="{StaticResource LabyricaTextPrimaryBrush}"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+
+                    <!-- Primary Action: Mirror Button -->
+                    <Button Grid.Row="2"
+                            Height="52"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Center"
+                            Command="{Binding MirrorCommand}"
+                            IsEnabled="{Binding IsPrimaryEnabled}"
+                            Classes="labyrica-primary">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <TextBlock Text="&#xE768;"
+                                       FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                       FontSize="16"
+                                       Margin="0,0,10,0"
+                                       VerticalAlignment="Center"
+                                       Foreground="Black"/>
+                            <TextBlock Text="{Binding PrimaryButtonText}"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       VerticalAlignment="Center"
+                                       Foreground="Black"
+                                       LetterSpacing="1"/>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Secondary Action: Screenshot -->
+                    <Button Grid.Row="4"
+                            Height="36"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Center"
+                            Command="{Binding ScreenshotCommand}"
+                            ToolTip.Tip="Capture screenshot"
+                            Classes="labyrica-secondary">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <TextBlock Text="&#xE722;"
+                                       FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                       FontSize="12"
+                                       Margin="0,0,6,0"
+                                       VerticalAlignment="Center"
+                                       Foreground="{StaticResource LabyricaTextPrimaryBrush}"/>
+                            <TextBlock Text="SCREENSHOT"
+                                       FontSize="11"
+                                       VerticalAlignment="Center"
+                                       Foreground="{StaticResource LabyricaTextPrimaryBrush}"
+                                       LetterSpacing="1"/>
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Settings Section -->
+                    <StackPanel Grid.Row="6" Orientation="Vertical">
+                        <Border Background="#19FFFFFF" Padding="8,4" CornerRadius="2" HorizontalAlignment="Left" Margin="0,0,0,12">
+                            <TextBlock Text="SETTINGS"
+                                       FontSize="10"
+                                       FontWeight="SemiBold"
+                                       Foreground="{StaticResource LabyricaTextAccentBrush}"
+                                       LetterSpacing="1"/>
+                        </Border>
+
+                        <!-- Quality Preset -->
+                        <TextBlock Text="QUALITY"
                                    FontSize="10"
-                                   FontWeight="SemiBold"
-                                   Foreground="{DynamicResource TextFillColorTertiaryBrush}"
-                                   VerticalAlignment="Center"/>
-                    </StackPanel>
-                    <TextBlock Text="{Binding DeviceDisplayName}"
-                               FontSize="12"
-                               Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                               TextTrimming="CharacterEllipsis"/>
-                </StackPanel>
-
-                <!-- Mirror button - hero element -->
-                <Button Grid.Row="1"
-                        Height="56"
-                        Margin="0,0,0,8"
-                        Padding="12,0"
-                        HorizontalAlignment="Stretch"
-                        HorizontalContentAlignment="Center"
-                        Command="{Binding MirrorCommand}"
-                        IsEnabled="{Binding IsPrimaryEnabled}"
-                        Classes="accent">
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <TextBlock Text="&#xE768;"
-                                   FontFamily="{StaticResource SymbolThemeFontFamily}"
-                                   FontSize="16"
-                                   Margin="0,0,8,0"
-                                   VerticalAlignment="Center"/>
-                        <TextBlock Text="{Binding PrimaryButtonText}"
-                                   FontSize="18"
-                                   FontWeight="SemiBold"
-                                   VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
-
-                <!-- Screenshot button - secondary action -->
-                <Button Grid.Row="2"
-                        Height="36"
-                        Margin="0,0,0,16"
-                        Padding="12,0"
-                        HorizontalAlignment="Stretch"
-                        HorizontalContentAlignment="Center"
-                        Command="{Binding ScreenshotCommand}"
-                        ToolTip.Tip="Capture screenshot to temp folder">
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <TextBlock Text="&#xE722;"
-                                   FontFamily="{StaticResource SymbolThemeFontFamily}"
-                                   FontSize="14"
-                                   Margin="0,0,6,0"
-                                   VerticalAlignment="Center"/>
-                        <TextBlock Text="Screenshot"
-                                   FontSize="13"
-                                   VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Button>
-
-                <!-- Settings section -->
-                <StackPanel Grid.Row="3"
-                            Orientation="Vertical">
-                    <TextBlock Text="SETTINGS"
-                               FontSize="10"
-                               FontWeight="SemiBold"
-                               Foreground="{DynamicResource TextFillColorTertiaryBrush}"
-                               Margin="0,0,0,12"/>
-
-                    <!-- Quality preset selector -->
-                    <StackPanel Orientation="Vertical" Margin="0,0,0,12">
-                        <TextBlock Text="QUALITY PRESET"
-                                   FontSize="10"
-                                   FontWeight="SemiBold"
-                                   Foreground="{DynamicResource TextFillColorTertiaryBrush}"
-                                   Margin="0,0,0,6"/>
+                                   Foreground="{StaticResource LabyricaTextSecondaryBrush}"
+                                   Margin="0,0,0,6"
+                                   LetterSpacing="0.5"/>
                         <ComboBox ItemsSource="{Binding Presets}"
                                   SelectedItem="{Binding SelectedPreset}"
-                                  Width="160"
-                                  HorizontalAlignment="Left"/>
-                    </StackPanel>
+                                  HorizontalAlignment="Stretch"
+                                  Margin="0,0,0,16"/>
 
-                    <!-- Options checkboxes -->
-                    <StackPanel Orientation="Vertical" Margin="0,4,0,0" Spacing="8">
-                        <CheckBox Content="Auto mirror when device connects"
-                                  IsChecked="{Binding AutoMirrorOnConnect}"
-                                  FontSize="12"/>
-                        <CheckBox Content="Start scrcpy in fullscreen"
-                                  IsChecked="{Binding StartFullscreen}"
-                                  FontSize="12"/>
-                        <CheckBox Content="Keep screen awake"
-                                  IsChecked="{Binding KeepScreenAwake}"
-                                  FontSize="12"/>
+                        <!-- Options -->
+                        <StackPanel Orientation="Vertical" Spacing="10">
+                            <CheckBox Content="Auto mirror on connect"
+                                      IsChecked="{Binding AutoMirrorOnConnect}"
+                                      FontSize="12"
+                                      Foreground="{StaticResource LabyricaTextPrimaryBrush}"/>
+                            <CheckBox Content="Start fullscreen"
+                                      IsChecked="{Binding StartFullscreen}"
+                                      FontSize="12"
+                                      Foreground="{StaticResource LabyricaTextPrimaryBrush}"/>
+                            <CheckBox Content="Keep screen awake"
+                                      IsChecked="{Binding KeepScreenAwake}"
+                                      FontSize="12"
+                                      Foreground="{StaticResource LabyricaTextPrimaryBrush}"/>
+                        </StackPanel>
                     </StackPanel>
-                </StackPanel>
-
-                <!-- Credits footer -->
-                <StackPanel Grid.Row="4"
-                            Margin="0,16,0,0"
-                            HorizontalAlignment="Right"
-                            Orientation="Horizontal"
-                            VerticalAlignment="Bottom">
-                    <StackPanel Orientation="Vertical"
-                                VerticalAlignment="Center">
-                        <TextBlock Text="Built by Labyrica"
-                                   FontSize="10"
-                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
-                        <TextBlock Text="labyrica.com"
-                                   FontSize="10"
-                                   Foreground="{DynamicResource TextFillColorTertiaryBrush}"/>
-                    </StackPanel>
-                </StackPanel>
-            </Grid>
-        </Border>
+                </Grid>
+            </Border>
+        </Grid>
     </Grid>
 
 </Window>

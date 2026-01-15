@@ -5,6 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Input;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -46,7 +49,7 @@ public partial class FloatingToolbarViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// Captures a screenshot from the device and saves it to temp folder.
+    /// Captures a screenshot from the device and copies it to clipboard.
     /// </summary>
     [RelayCommand]
     private async Task ScreenshotAsync()
@@ -75,8 +78,17 @@ public partial class FloatingToolbarViewModel : ViewModelBase
 
             if (clipboard != null)
             {
-                await clipboard.SetTextAsync(tempPath);
-                ShowStatus("Saved!");
+                // Copy actual image to clipboard using DataObject
+                using var memoryStream = new MemoryStream(pngData);
+                var bitmap = new Bitmap(memoryStream);
+                var dataObject = new DataObject();
+                dataObject.Set(DataFormats.Files, new[] { new FileInfo(tempPath) });
+
+                // Set as text fallback (file path) for apps that don't support file drops
+                dataObject.Set(DataFormats.Text, tempPath);
+
+                await clipboard.SetDataObjectAsync(dataObject);
+                ShowStatus("Copied!");
             }
             else
             {

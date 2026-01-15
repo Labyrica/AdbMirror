@@ -7,7 +7,62 @@
     <Application.DataTemplates>
         <local:ViewLocator/>
     </Application.DataTemplates>
+
+    <Application.Resources>
+        <!-- Labyrica Design System Colors -->
+        <Color x:Key="LabyricaBackground">#000000</Color>
+        <Color x:Key="LabyricaSurface">#111111</Color>
+        <Color x:Key="LabyricaTextPrimary">#FFFFFF</Color>
+        <Color x:Key="LabyricaTextSecondary">#999999</Color>
+        <Color x:Key="LabyricaTextAccent">#CCCCCC</Color>
+        <Color x:Key="LabyricaBorderPrimary">#222222</Color>
+        <Color x:Key="LabyricaBorderSecondary">#333333</Color>
+        <Color x:Key="LabyricaSuccess">#40F99B</Color>
+        <Color x:Key="LabyricaError">#FF3333</Color>
+        <Color x:Key="LabyricaWarning">#F5A623</Color>
+
+        <!-- Brushes -->
+        <SolidColorBrush x:Key="LabyricaBackgroundBrush" Color="{StaticResource LabyricaBackground}"/>
+        <SolidColorBrush x:Key="LabyricaSurfaceBrush" Color="{StaticResource LabyricaSurface}"/>
+        <SolidColorBrush x:Key="LabyricaTextPrimaryBrush" Color="{StaticResource LabyricaTextPrimary}"/>
+        <SolidColorBrush x:Key="LabyricaTextSecondaryBrush" Color="{StaticResource LabyricaTextSecondary}"/>
+        <SolidColorBrush x:Key="LabyricaTextAccentBrush" Color="{StaticResource LabyricaTextAccent}"/>
+        <SolidColorBrush x:Key="LabyricaBorderPrimaryBrush" Color="{StaticResource LabyricaBorderPrimary}"/>
+        <SolidColorBrush x:Key="LabyricaBorderSecondaryBrush" Color="{StaticResource LabyricaBorderSecondary}"/>
+        <SolidColorBrush x:Key="LabyricaSuccessBrush" Color="{StaticResource LabyricaSuccess}"/>
+        <SolidColorBrush x:Key="LabyricaErrorBrush" Color="{StaticResource LabyricaError}"/>
+        <SolidColorBrush x:Key="LabyricaWarningBrush" Color="{StaticResource LabyricaWarning}"/>
+
+        <!-- Corner Radius - Industrial, not rounded -->
+        <CornerRadius x:Key="LabyricaCornerRadiusSm">2</CornerRadius>
+        <CornerRadius x:Key="LabyricaCornerRadius">3</CornerRadius>
+        <CornerRadius x:Key="LabyricaCornerRadiusLg">4</CornerRadius>
+    </Application.Resources>
+
     <Application.Styles>
         <sty:FluentAvaloniaTheme />
+
+        <!-- Labyrica Primary Button Style -->
+        <Style Selector="Button.labyrica-primary">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Foreground" Value="Black"/>
+            <Setter Property="CornerRadius" Value="3"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+        <Style Selector="Button.labyrica-primary:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#E6E6E6"/>
+        </Style>
+
+        <!-- Labyrica Secondary/Ghost Button Style -->
+        <Style Selector="Button.labyrica-secondary">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="{StaticResource LabyricaBorderPrimaryBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="3"/>
+        </Style>
+        <Style Selector="Button.labyrica-secondary:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#0DFFFFFF"/>
+        </Style>
     </Application.Styles>
 </Application>
