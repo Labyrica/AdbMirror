@@ -58,7 +58,7 @@ Plans:
 Plans:
 - [x] 03-01: MainWindow shell and layout (Wave 1)
 - [x] 03-02: Device list and connection status UI (Wave 2)
-- [ ] 03-03: Mirroring controls and quality selector (Wave 2)
+- [x] 03-03: Mirroring controls and quality selector (Wave 2)
 - [ ] 03-04: Settings persistence and options panel (Wave 3)
 
 ### Phase 4: Capture Features
@@ -106,7 +106,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 |-------|----------------|--------|-----------|
 | 1. Project Scaffold | 1/1 | Complete | 2026-01-15 |
 | 2. Core Services | 4/4 | Complete | 2026-01-15 |
-| 3. Mirror UI | 2/4 | In progress | - |
+| 3. Mirror UI | 3/4 | In progress | - |
 | 4. Capture Features | 0/3 | Not started | - |
 | 5. Logging UI | 0/2 | Not started | - |
 | 6. Packaging | 0/3 | Not started | - |
