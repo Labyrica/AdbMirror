@@ -4,12 +4,15 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Platform;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PhoneMirror.Core.Models;
 using PhoneMirror.Core.Services;
+using PhoneMirror.Views;
 
 namespace PhoneMirror.ViewModels;
 
@@ -21,8 +24,10 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     private readonly IAdbService _adbService;
     private readonly IScrcpyService _scrcpyService;
     private readonly IScreenshotService _screenshotService;
+    private readonly ILogcatService _logcatService;
     private readonly ISettingsService _settings;
     private readonly CancellationTokenSource _pollCts = new();
+    private FloatingToolbar? _floatingToolbar;
     private bool _disposed;
 
     /// <summary>
@@ -165,16 +170,19 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     /// <param name="adbService">The ADB service for device communication.</param>
     /// <param name="scrcpyService">The scrcpy service for screen mirroring.</param>
     /// <param name="screenshotService">The screenshot service for capturing device screen.</param>
+    /// <param name="logcatService">The logcat service for capturing device errors.</param>
     /// <param name="settingsService">The settings service for persisting user preferences.</param>
     public MainWindowViewModel(
         IAdbService adbService,
         IScrcpyService scrcpyService,
         IScreenshotService screenshotService,
+        ILogcatService logcatService,
         ISettingsService settingsService)
     {
         _adbService = adbService ?? throw new ArgumentNullException(nameof(adbService));
         _scrcpyService = scrcpyService ?? throw new ArgumentNullException(nameof(scrcpyService));
         _screenshotService = screenshotService ?? throw new ArgumentNullException(nameof(screenshotService));
+        _logcatService = logcatService ?? throw new ArgumentNullException(nameof(logcatService));
         _settings = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
 
         // Initialize all properties from persisted settings
@@ -297,6 +305,10 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             _isMirroring = false;
             PrimaryButtonText = "Mirror";
 
+            // Stop logcat capture and close toolbar
+            _logcatService.StopCapture();
+            CloseFloatingToolbar();
+
             // Update status with exit message
             StatusText = message;
 
@@ -325,6 +337,10 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             _scrcpyService.StopMirroring();
             _isMirroring = false;
             PrimaryButtonText = "Mirror";
+
+            // Stop logcat capture and close toolbar
+            _logcatService.StopCapture();
+            CloseFloatingToolbar();
         }
         else
         {
@@ -356,8 +372,57 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             else
             {
                 StatusText = "Mirroring active";
+
+                // Start logcat capture for error monitoring
+                await _logcatService.StartCaptureAsync(serial);
+
+                // Show floating toolbar
+                ShowFloatingToolbar(serial);
             }
         }
+    }
+
+    /// <summary>
+    /// Creates and shows the floating toolbar window.
+    /// </summary>
+    /// <param name="deviceSerial">The serial number of the connected device.</param>
+    private void ShowFloatingToolbar(string deviceSerial)
+    {
+        // Create ViewModel for toolbar
+        var toolbarViewModel = new FloatingToolbarViewModel(
+            _screenshotService,
+            _logcatService,
+            deviceSerial);
+
+        // Create toolbar window
+        _floatingToolbar = new FloatingToolbar
+        {
+            DataContext = toolbarViewModel
+        };
+
+        // Position toolbar on right edge of primary screen, vertically centered
+        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            var screen = desktop.MainWindow?.Screens?.Primary;
+            if (screen != null)
+            {
+                var workingArea = screen.WorkingArea;
+                _floatingToolbar.Position = new PixelPoint(
+                    workingArea.Right - (int)_floatingToolbar.Width - 20,
+                    (workingArea.Height - (int)_floatingToolbar.Height) / 2 + workingArea.Y);
+            }
+        }
+
+        _floatingToolbar.Show();
+    }
+
+    /// <summary>
+    /// Closes and disposes the floating toolbar window.
+    /// </summary>
+    private void CloseFloatingToolbar()
+    {
+        _floatingToolbar?.Close();
+        _floatingToolbar = null;
     }
 
     // ========== Screenshot Commands ==========
@@ -440,6 +505,9 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
         if (disposing)
         {
+            // Close floating toolbar if open
+            CloseFloatingToolbar();
+
             // Unsubscribe from events
             _scrcpyService.MirroringStopped -= OnMirroringStopped;
 
