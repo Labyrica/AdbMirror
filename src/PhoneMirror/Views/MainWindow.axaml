@@ -3,36 +3,41 @@
         xmlns:vm="using:PhoneMirror.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="600"
+        mc:Ignorable="d" d:DesignWidth="760" d:DesignHeight="460"
         x:Class="PhoneMirror.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="Phone Mirror"
-        Width="400"
-        Height="600"
-        Background="{DynamicResource ApplicationBackgroundBrush}">
+        Width="760"
+        Height="460"
+        MinWidth="640"
+        MinHeight="380"
+        CanResize="True"
+        Background="{DynamicResource ApplicationPageBackgroundThemeBrush}">
 
     <Design.DataContext>
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <Grid RowDefinitions="Auto,*">
-        <!-- Header -->
-        <Border Grid.Row="0"
+    <Grid ColumnDefinitions="2.2*,1.4*">
+        <!-- LEFT: Status + logs -->
+        <Border Grid.Column="0"
+                Margin="24,24,16,24"
                 Padding="16"
-                Background="{DynamicResource CardBackgroundFillColorDefaultBrush}">
-            <TextBlock Text="Phone Mirror"
-                       FontSize="24"
-                       FontWeight="SemiBold"
-                       HorizontalAlignment="Center"/>
+                Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                CornerRadius="8">
+            <TextBlock Text="Left panel placeholder"
+                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
         </Border>
 
-        <!-- Content area placeholder -->
-        <TextBlock Grid.Row="1"
-                   Text="Ready to connect"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                   FontSize="14"/>
+        <!-- RIGHT: Controls -->
+        <Border Grid.Column="1"
+                Margin="0,24,24,24"
+                Padding="16"
+                Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                CornerRadius="8">
+            <TextBlock Text="Right panel placeholder"
+                       Foreground="{DynamicResource TextFillColorSecondaryBrush}"/>
+        </Border>
     </Grid>
 
 </Window>
