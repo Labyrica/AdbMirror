@@ -16,7 +16,7 @@ None
 
 - [x] **Phase 1: Project Scaffold** - Avalonia solution setup with DI and theming
 - [x] **Phase 2: Core Services** - ADB/scrcpy services with cross-platform process handling
-- [ ] **Phase 3: Mirror UI** - Main window with device list and mirroring controls
+- [x] **Phase 3: Mirror UI** - Main window with device list and mirroring controls
 - [ ] **Phase 4: Capture Features** - Screenshot toolbar and session error capture
 - [ ] **Phase 5: Logging UI** - Collapsible log panel with copy functionality
 - [ ] **Phase 6: Packaging** - Platform-specific installers and distribution
@@ -48,18 +48,19 @@ Plans:
 - [x] 02-03: ScrcpyService migration with quality presets
 - [x] 02-04: Resource extraction for bundled binaries
 
-### Phase 3: Mirror UI
+### Phase 3: Mirror UI ✓
 **Goal**: Convert main window with device list, controls, and settings
 **Depends on**: Phase 2
 **Requirements**: MIRR-01, MIRR-02, MIRR-03, MIRR-04, MIRR-05, MIRR-06, MIRR-07, UX-02, UX-03
 **Research**: Unlikely (WPF to Avalonia XAML conversion documented)
 **Plans**: 4 plans (3 waves)
+**Completed**: 2026-01-15
 
 Plans:
 - [x] 03-01: MainWindow shell and layout (Wave 1)
 - [x] 03-02: Device list and connection status UI (Wave 2)
 - [x] 03-03: Mirroring controls and quality selector (Wave 2)
-- [ ] 03-04: Settings persistence and options panel (Wave 3)
+- [x] 03-04: Settings persistence and options panel (Wave 3)
 
 ### Phase 4: Capture Features
 **Goal**: Add screenshot to clipboard and session error capture
@@ -106,7 +107,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 |-------|----------------|--------|-----------|
 | 1. Project Scaffold | 1/1 | Complete | 2026-01-15 |
 | 2. Core Services | 4/4 | Complete | 2026-01-15 |
-| 3. Mirror UI | 3/4 | In progress | - |
+| 3. Mirror UI | 4/4 | Complete | 2026-01-15 |
 | 4. Capture Features | 0/3 | Not started | - |
 | 5. Logging UI | 0/2 | Not started | - |
 | 6. Packaging | 0/3 | Not started | - |
