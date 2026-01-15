@@ -333,7 +333,8 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             var (success, error) = await _scrcpyService.StartMirroringAsync(
                 serial,
                 SelectedPreset,
-                keepScreenAwake: true);
+                KeepScreenAwake,
+                StartFullscreen);
 
             if (!success)
             {

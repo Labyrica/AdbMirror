@@ -46,6 +46,7 @@ public sealed class ScrcpyService : IScrcpyService
         string deviceSerial,
         ScrcpyPreset preset,
         bool keepScreenAwake,
+        bool fullscreen,
         CancellationToken cancellationToken = default)
     {
         // Clean up any existing session
@@ -58,7 +59,7 @@ public sealed class ScrcpyService : IScrcpyService
             return (false, $"scrcpy not found. Please ensure {executableName} is available in the application directory or in PATH.");
         }
 
-        var args = BuildArguments(deviceSerial, preset, keepScreenAwake);
+        var args = BuildArguments(deviceSerial, preset, keepScreenAwake, fullscreen);
 
         var psi = new ProcessStartInfo
         {
@@ -264,7 +265,7 @@ public sealed class ScrcpyService : IScrcpyService
     /// <summary>
     /// Builds the scrcpy command-line arguments for the given options.
     /// </summary>
-    private static string BuildArguments(string serial, ScrcpyPreset preset, bool keepScreenAwake)
+    private static string BuildArguments(string serial, ScrcpyPreset preset, bool keepScreenAwake, bool fullscreen)
     {
         var builder = new StringBuilder();
 
@@ -289,6 +290,12 @@ public sealed class ScrcpyService : IScrcpyService
         if (keepScreenAwake)
         {
             builder.Append(" --stay-awake");
+        }
+
+        // Fullscreen option
+        if (fullscreen)
+        {
+            builder.Append(" --fullscreen");
         }
 
         // Turn off device screen during mirroring (requires control enabled, which is default)

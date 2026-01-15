@@ -29,12 +29,14 @@ public interface IScrcpyService
     /// <param name="deviceSerial">The serial number of the device to mirror.</param>
     /// <param name="preset">The quality preset to use.</param>
     /// <param name="keepScreenAwake">Whether to keep the device screen awake during mirroring.</param>
+    /// <param name="fullscreen">Whether to start scrcpy in fullscreen mode.</param>
     /// <param name="cancellationToken">A token to cancel the operation.</param>
     /// <returns>A tuple indicating success and an optional error message.</returns>
     Task<(bool Success, string? Error)> StartMirroringAsync(
         string deviceSerial,
         ScrcpyPreset preset,
         bool keepScreenAwake,
+        bool fullscreen,
         CancellationToken cancellationToken = default);
 
     /// <summary>
