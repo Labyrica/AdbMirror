@@ -105,18 +105,25 @@
             <Grid RowDefinitions="Auto,Auto,*,Auto">
                 <!-- Device summary -->
                 <StackPanel Grid.Row="0"
-                            Orientation="Horizontal"
+                            Orientation="Vertical"
                             Margin="0,0,0,16">
-                    <TextBlock Text="&#xE8EA;"
-                               FontFamily="{StaticResource SymbolThemeFontFamily}"
-                               FontSize="16"
-                               Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                               Margin="0,0,8,0"
-                               VerticalAlignment="Center"/>
-                    <TextBlock Text="Connected device"
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                        <TextBlock Text="&#xE8EA;"
+                                   FontFamily="{StaticResource SymbolThemeFontFamily}"
+                                   FontSize="16"
+                                   Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                                   Margin="0,0,8,0"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Text="DEVICE"
+                                   FontSize="10"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <TextBlock Text="{Binding DeviceDisplayName}"
                                FontSize="12"
                                Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-                               VerticalAlignment="Center"/>
+                               TextTrimming="CharacterEllipsis"/>
                 </StackPanel>
 
                 <!-- Mirror button placeholder (command binding in 03-03) -->
