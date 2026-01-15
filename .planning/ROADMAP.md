@@ -80,11 +80,10 @@ Plans:
 **Depends on**: Phase 4
 **Requirements**: LOGS-02, LOGS-03, LOGS-04
 **Research**: Unlikely (internal UI patterns)
-**Plans**: TBD
+**Plans**: 1 plan (1 wave)
 
 Plans:
-- [ ] 05-01: Collapsible log panel in main window
-- [ ] 05-02: Copy to clipboard and actionable error messages
+- [ ] 05-01: Log panel with copy and actionable guidance (Wave 1)
 
 ### Phase 6: Packaging
 **Goal**: Create platform-specific installers for Windows, macOS, and Linux
@@ -110,5 +109,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Core Services | 4/4 | Complete | 2026-01-15 |
 | 3. Mirror UI | 4/4 | Complete | 2026-01-15 |
 | 4. Capture Features | 3/3 | Complete | 2026-01-15 |
-| 5. Logging UI | 0/2 | Not started | - |
+| 5. Logging UI | 0/1 | Planned | - |
 | 6. Packaging | 0/3 | Not started | - |
