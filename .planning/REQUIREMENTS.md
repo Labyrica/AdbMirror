@@ -22,13 +22,13 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Mirroring Control
 
-- [ ] **MIRR-01**: User can start/stop mirroring with single button click
-- [ ] **MIRR-02**: User can select quality preset (Low/Balanced/High)
-- [ ] **MIRR-03**: User can enable keep screen awake option
-- [ ] **MIRR-04**: User can enable auto-mirror on device connect
-- [ ] **MIRR-05**: User can toggle full-screen mode for mirror window
-- [ ] **MIRR-06**: User can toggle always-on-top for mirror window
-- [ ] **MIRR-07**: User can resize mirror window freely (windowed mode)
+- [x] **MIRR-01**: User can start/stop mirroring with single button click
+- [x] **MIRR-02**: User can select quality preset (Low/Balanced/High)
+- [x] **MIRR-03**: User can enable keep screen awake option
+- [x] **MIRR-04**: User can enable auto-mirror on device connect
+- [x] **MIRR-05**: User can toggle full-screen mode for mirror window
+- [x] **MIRR-06**: User can toggle always-on-top for mirror window
+- [x] **MIRR-07**: User can resize mirror window freely (windowed mode)
 
 ### Capture & Clipboard
 
@@ -47,8 +47,8 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Consumer UX
 
 - [x] **UX-01**: App uses dark theme (Lab visual identity)
-- [ ] **UX-02**: App persists user settings between sessions
-- [ ] **UX-03**: UI is simplified with reduced visible complexity
+- [x] **UX-02**: App persists user settings between sessions
+- [x] **UX-03**: UI is simplified with reduced visible complexity
 
 ## v2 Requirements
 
@@ -97,13 +97,13 @@ Which phases cover which requirements. Updated by create-roadmap.
 | CONN-02 | Phase 2 | Complete |
 | CONN-03 | Phase 2 | Complete |
 | CONN-04 | Phase 2 | Complete |
-| MIRR-01 | Phase 3 | Pending |
-| MIRR-02 | Phase 3 | Pending |
-| MIRR-03 | Phase 3 | Pending |
-| MIRR-04 | Phase 3 | Pending |
-| MIRR-05 | Phase 3 | Pending |
-| MIRR-06 | Phase 3 | Pending |
-| MIRR-07 | Phase 3 | Pending |
+| MIRR-01 | Phase 3 | Complete |
+| MIRR-02 | Phase 3 | Complete |
+| MIRR-03 | Phase 3 | Complete |
+| MIRR-04 | Phase 3 | Complete |
+| MIRR-05 | Phase 3 | Complete |
+| MIRR-06 | Phase 3 | Complete |
+| MIRR-07 | Phase 3 | Complete |
 | CAPT-01 | Phase 4 | Pending |
 | CAPT-02 | Phase 4 | Pending |
 | CAPT-03 | Phase 4 | Pending |
@@ -113,8 +113,8 @@ Which phases cover which requirements. Updated by create-roadmap.
 | LOGS-03 | Phase 5 | Pending |
 | LOGS-04 | Phase 5 | Pending |
 | UX-01 | Phase 1 | Complete |
-| UX-02 | Phase 3 | Pending |
-| UX-03 | Phase 3 | Pending |
+| UX-02 | Phase 3 | Complete |
+| UX-03 | Phase 3 | Complete |
 
 **Coverage:**
 - v1 requirements: 25 total
@@ -123,4 +123,4 @@ Which phases cover which requirements. Updated by create-roadmap.
 
 ---
 *Requirements defined: 2026-01-15*
-*Last updated: 2026-01-15 after Phase 2 completion*
+*Last updated: 2026-01-15 after Phase 3 completion*
