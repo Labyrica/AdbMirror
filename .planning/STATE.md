@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-01-15)
 
 ## Current Position
 
-Phase: 3 of 6 (Mirror UI) - COMPLETE
-Plan: 4/4 complete in current phase
-Status: Phase complete
-Last activity: 2026-01-15 — Completed 03-04-PLAN.md
+Phase: 4 of 6 (Capture Features)
+Plan: 1 of 3 in current phase
+Status: In progress
+Last activity: 2026-01-15 — Completed 04-03-PLAN.md
 
-Progress: █████████░ 53%
+Progress: ██████████░ 59%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
+- Total plans completed: 10
 - Average duration: 8min
-- Total execution time: ~75min
+- Total execution time: ~80min
 
 **By Phase:**
 
@@ -30,9 +30,10 @@ Progress: █████████░ 53%
 | 1 | 1/1 | — | — |
 | 2 | 4/4 | ~40min | ~10min |
 | 3 | 4/4 | ~30min | ~7.5min |
+| 4 | 1/3 | ~5min | ~5min |
 
 **Recent Trend:**
-- Last 5 plans: 02-04, 03-01, 03-02, 03-03, 03-04
+- Last 5 plans: 03-01, 03-02, 03-03, 03-04, 04-03
 - Trend: Stable
 
 ## Accumulated Context
@@ -54,6 +55,7 @@ Recent decisions affecting current work:
 - Phase 3-03: Toggle command pattern for single start/stop command
 - Phase 3-04: Settings auto-save on property change for immediate persistence
 - Phase 3-04: Track last auto-mirrored serial to prevent repeated triggers
+- Phase 4-03: ConcurrentQueue for thread-safe circular buffer in LogcatService
 
 ### Pending Todos
 
@@ -66,17 +68,15 @@ None.
 ## Session Continuity
 
 Last session: 2026-01-15
-Stopped at: Completed 03-04-PLAN.md (Phase 3 complete)
+Stopped at: Completed 04-03-PLAN.md
 Resume file: None
 
-## Phase 3 Summary
+## Phase 4 Progress
 
-**Wave 1:** 03-01 (MainWindow shell/layout) - COMPLETE
-**Wave 2:** 03-02 (device status) + 03-03 (mirroring controls) - COMPLETE
-**Wave 3:** 03-04 (settings persistence) - COMPLETE
+**Wave 1:** 04-01 (screenshot), 04-03 (logcat) — 04-03 COMPLETE
+**Wave 2:** 04-02 (floating toolbar)
 
-Phase 3 delivers:
-- Full MainWindow UI with FluentAvalonia dark theme
-- Device status display with polling
-- Mirror/Stop toggle button with quality presets
-- Settings persistence (auto-mirror, fullscreen, keep-screen-awake)
+Plan 04-03 delivers:
+- ILogcatService interface for session-scoped error capture
+- LogcatService with ConcurrentQueue circular buffer (max 1000 entries)
+- GetRecentErrors() for 10-second window filtering

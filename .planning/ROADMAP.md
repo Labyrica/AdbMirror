@@ -72,7 +72,7 @@ Plans:
 Plans:
 - [ ] 04-01: ADB screenshot to clipboard (Wave 1)
 - [ ] 04-02: Floating toolbar window (Wave 2)
-- [ ] 04-03: Session logcat error capture (Wave 1)
+- [x] 04-03: Session logcat error capture (Wave 1)
 
 ### Phase 5: Logging UI
 **Goal**: Add collapsible log panel with copy functionality and error guidance
@@ -108,6 +108,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. Project Scaffold | 1/1 | Complete | 2026-01-15 |
 | 2. Core Services | 4/4 | Complete | 2026-01-15 |
 | 3. Mirror UI | 4/4 | Complete | 2026-01-15 |
-| 4. Capture Features | 0/3 | Planned | - |
+| 4. Capture Features | 1/3 | In progress | - |
 | 5. Logging UI | 0/2 | Not started | - |
 | 6. Packaging | 0/3 | Not started | - |
