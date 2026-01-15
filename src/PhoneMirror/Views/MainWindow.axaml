@@ -170,6 +170,19 @@
                                   Width="160"
                                   HorizontalAlignment="Left"/>
                     </StackPanel>
+
+                    <!-- Options checkboxes -->
+                    <StackPanel Orientation="Vertical" Margin="0,4,0,0" Spacing="8">
+                        <CheckBox Content="Auto mirror when device connects"
+                                  IsChecked="{Binding AutoMirrorOnConnect}"
+                                  FontSize="12"/>
+                        <CheckBox Content="Start scrcpy in fullscreen"
+                                  IsChecked="{Binding StartFullscreen}"
+                                  FontSize="12"/>
+                        <CheckBox Content="Keep screen awake"
+                                  IsChecked="{Binding KeepScreenAwake}"
+                                  FontSize="12"/>
+                    </StackPanel>
                 </StackPanel>
 
                 <!-- Credits footer -->
