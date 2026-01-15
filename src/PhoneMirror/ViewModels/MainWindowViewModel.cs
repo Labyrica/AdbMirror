@@ -68,6 +68,11 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     private bool _isMirroring;
 
     /// <summary>
+    /// Serial of the last device that was auto-mirrored (to prevent repeated triggers).
+    /// </summary>
+    private string? _lastAutoMirroredSerial;
+
+    /// <summary>
     /// Available quality presets for mirroring.
     /// </summary>
     public ObservableCollection<ScrcpyPreset> Presets { get; } = new(
@@ -220,6 +225,12 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         _currentState = state;
         _currentDevice = device;
 
+        // Reset auto-mirror tracking when device disconnects
+        if (state == DeviceState.NoDevice || state == DeviceState.Offline)
+        {
+            _lastAutoMirroredSerial = null;
+        }
+
         // Update UI on the UI thread
         Dispatcher.UIThread.Post(() =>
         {
@@ -246,6 +257,17 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
             // Notify that CanMirror may have changed
             MirrorCommand.NotifyCanExecuteChanged();
+
+            // Auto-mirror when device connects (if enabled and not already auto-mirrored)
+            if (state == DeviceState.Connected &&
+                AutoMirrorOnConnect &&
+                !_isMirroring &&
+                device != null &&
+                device.Serial != _lastAutoMirroredSerial)
+            {
+                _lastAutoMirroredSerial = device.Serial;
+                _ = MirrorAsync();
+            }
         });
     }
 
