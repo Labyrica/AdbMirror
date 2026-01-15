@@ -90,14 +90,13 @@ Plans:
 **Goal**: Create platform-specific installers for Windows, macOS, and Linux
 **Depends on**: Phase 5
 **Requirements**: (polish/packaging phase - no functional requirements)
-**Research**: Likely (platform-specific installers)
-**Research topics**: Velopack setup, macOS notarization workflow, AppImage creation
-**Plans**: TBD
+**Research**: Complete (integrated into plans)
+**Plans**: 3 plans (2 waves)
 
 Plans:
-- [ ] 06-01: Windows installer (Velopack or MSIX)
-- [ ] 06-02: macOS app bundle with signing
-- [ ] 06-03: Linux AppImage
+- [ ] 06-01: Resource embedding and Windows packaging (Wave 1)
+- [ ] 06-02: macOS app bundle with signing (Wave 2, depends: 06-01)
+- [ ] 06-03: Linux AppImage (Wave 2, depends: 06-01)
 
 ## Progress
 
