@@ -5,13 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Input;
-using Avalonia.Media.Imaging;
-using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PhoneMirror.Core.Services;
+using PhoneMirror.Services;
 
 namespace PhoneMirror.ViewModels;
 
@@ -66,33 +64,35 @@ public partial class FloatingToolbarViewModel : ViewModelBase
 
         try
         {
-            // Save to temp file
+            // Save to temp file as backup
             var tempPath = Path.Combine(
                 Path.GetTempPath(),
                 $"PhoneMirror_Screenshot_{DateTime.Now:yyyyMMdd_HHmmss}.png");
             await File.WriteAllBytesAsync(tempPath, pngData);
 
-            var clipboard = Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
-                ? desktop.MainWindow?.Clipboard
-                : null;
+            // Copy image to clipboard using Windows API for proper Ctrl+V support
+            var success = await ClipboardService.CopyImageToClipboardAsync(pngData);
 
-            if (clipboard != null)
+            if (success)
             {
-                // Copy actual image to clipboard using DataObject
-                using var memoryStream = new MemoryStream(pngData);
-                var bitmap = new Bitmap(memoryStream);
-                var dataObject = new DataObject();
-                dataObject.Set(DataFormats.Files, new[] { new FileInfo(tempPath) });
-
-                // Set as text fallback (file path) for apps that don't support file drops
-                dataObject.Set(DataFormats.Text, tempPath);
-
-                await clipboard.SetDataObjectAsync(dataObject);
                 ShowStatus("Copied!");
             }
             else
             {
-                ShowStatus("Saved to temp");
+                // Fallback: copy file path to clipboard
+                var clipboard = Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
+                    ? desktop.MainWindow?.Clipboard
+                    : null;
+
+                if (clipboard != null)
+                {
+                    await clipboard.SetTextAsync(tempPath);
+                    ShowStatus("Saved (path copied)");
+                }
+                else
+                {
+                    ShowStatus("Saved to temp");
+                }
             }
         }
         catch (Exception ex)

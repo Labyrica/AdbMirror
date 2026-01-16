@@ -48,6 +48,9 @@ public partial class App : Application
                 DataContext = mainViewModel
             };
 
+            // Show the main window
+            desktop.MainWindow.Show();
+
             // Register cleanup on app exit
             desktop.ShutdownRequested += (_, _) => resourceExtractor.Cleanup();
         }

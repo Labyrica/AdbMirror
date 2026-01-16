@@ -15,6 +15,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PhoneMirror.Core.Models;
 using PhoneMirror.Core.Services;
+using PhoneMirror.Services;
 using PhoneMirror.Views;
 
 namespace PhoneMirror.ViewModels;
@@ -168,7 +169,19 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         }
     }
 
-    // ========== Log Panel Properties ==========
+    // ========== Panel Visibility Properties ==========
+
+    /// <summary>
+    /// Whether the settings panel is visible.
+    /// </summary>
+    [ObservableProperty]
+    private bool _isSettingsVisible;
+
+    /// <summary>
+    /// Whether the logs panel is visible.
+    /// </summary>
+    [ObservableProperty]
+    private bool _isLogsVisible;
 
     /// <summary>
     /// Whether the log panel is expanded.
@@ -183,9 +196,24 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     private ObservableCollection<LogcatEntry> _logEntries = new();
 
     /// <summary>
+    /// Simple string log messages for display.
+    /// </summary>
+    public ObservableCollection<string> LogMessages { get; } = new();
+
+    /// <summary>
     /// Gets the log entry count text for display in the header.
     /// </summary>
     public string LogEntryCountText => LogEntries.Count > 0 ? $"({LogEntries.Count})" : "";
+
+    /// <summary>
+    /// Gets the ADB path for display in settings.
+    /// </summary>
+    public string AdbPath => _adbService.AdbPath ?? "Not found";
+
+    /// <summary>
+    /// Gets the scrcpy path for display in settings.
+    /// </summary>
+    public string ScrcpyPath => _scrcpyService.ScrcpyPath ?? "Not found";
 
     /// <summary>
     /// Initializes a new instance of the MainWindowViewModel.
@@ -335,6 +363,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
             // Clear log entries
             LogEntries.Clear();
+            LogMessages.Clear();
             OnPropertyChanged(nameof(LogEntryCountText));
 
             // Update status with exit message
@@ -373,6 +402,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
             // Clear log entries
             LogEntries.Clear();
+            LogMessages.Clear();
             OnPropertyChanged(nameof(LogEntryCountText));
         }
         else
@@ -436,16 +466,18 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             DataContext = toolbarViewModel
         };
 
-        // Position toolbar on right edge of primary screen, vertically centered
+        // Position toolbar on right edge of screen, vertically centered
+        // The toolbar will appear alongside the scrcpy window
         if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             var screen = desktop.MainWindow?.Screens?.Primary;
             if (screen != null)
             {
                 var workingArea = screen.WorkingArea;
+                // Position on the right side of screen, vertically centered
                 _floatingToolbar.Position = new PixelPoint(
-                    workingArea.Right - (int)_floatingToolbar.Width - 20,
-                    (workingArea.Height - (int)_floatingToolbar.Height) / 2 + workingArea.Y);
+                    workingArea.Right - (int)_floatingToolbar.Width - 12,
+                    workingArea.Y + (workingArea.Height - (int)_floatingToolbar.Height) / 2);
             }
         }
 
@@ -461,7 +493,19 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         _floatingToolbar = null;
     }
 
-    // ========== Log Panel Commands ==========
+    // ========== Panel Toggle Commands ==========
+
+    /// <summary>
+    /// Toggles the settings panel visibility.
+    /// </summary>
+    [RelayCommand]
+    private void ToggleSettings() => IsSettingsVisible = !IsSettingsVisible;
+
+    /// <summary>
+    /// Toggles the logs panel visibility.
+    /// </summary>
+    [RelayCommand]
+    private void ToggleLogs() => IsLogsVisible = !IsLogsVisible;
 
     /// <summary>
     /// Toggles the log panel expanded state.
@@ -497,6 +541,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     private void ClearLogs()
     {
         LogEntries.Clear();
+        LogMessages.Clear();
         _logcatService.ClearErrors();
         OnPropertyChanged(nameof(LogEntryCountText));
     }
@@ -561,7 +606,9 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         // Only add new entries
         for (var i = currentCount; i < allErrors.Count; i++)
         {
-            LogEntries.Add(allErrors[i]);
+            var entry = allErrors[i];
+            LogEntries.Add(entry);
+            LogMessages.Add($"[{entry.Timestamp:HH:mm:ss}] {entry.Tag}: {entry.Message}");
         }
 
         // Notify count changed if entries were added
@@ -602,33 +649,40 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             return;
         }
 
-        // Save screenshot to temp file and copy to clipboard
-        // Note: Avalonia clipboard bitmap support is limited, so we save to file
-        // and copy the file path to clipboard as a reliable fallback
         try
         {
-            // Save to temp file
+            // Save to temp file as backup
             var tempPath = Path.Combine(Path.GetTempPath(), $"PhoneMirror_Screenshot_{DateTime.Now:yyyyMMdd_HHmmss}.png");
             await File.WriteAllBytesAsync(tempPath, pngData);
 
-            var clipboard = Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
-                ? desktop.MainWindow?.Clipboard
-                : null;
+            // Copy image to clipboard using Windows API for proper Ctrl+V support
+            var success = await ClipboardService.CopyImageToClipboardAsync(pngData);
 
-            if (clipboard != null)
+            if (success)
             {
-                // Copy file path as text so user knows where it is
-                await clipboard.SetTextAsync(tempPath);
-                StatusText = $"Screenshot saved and path copied: {Path.GetFileName(tempPath)}";
+                StatusText = "Screenshot copied to clipboard";
             }
             else
             {
-                StatusText = $"Screenshot saved to: {tempPath}";
+                // Fallback: copy file path to clipboard
+                var clipboard = Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
+                    ? desktop.MainWindow?.Clipboard
+                    : null;
+
+                if (clipboard != null)
+                {
+                    await clipboard.SetTextAsync(tempPath);
+                    StatusText = $"Screenshot saved: {Path.GetFileName(tempPath)}";
+                }
+                else
+                {
+                    StatusText = $"Screenshot saved to: {tempPath}";
+                }
             }
         }
         catch (Exception ex)
         {
-            StatusText = $"Screenshot save error: {ex.Message}";
+            StatusText = $"Screenshot error: {ex.Message}";
         }
     }
 

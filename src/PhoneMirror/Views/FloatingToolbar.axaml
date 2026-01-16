@@ -3,12 +3,12 @@
         xmlns:vm="using:PhoneMirror.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="150" d:DesignHeight="60"
+        mc:Ignorable="d" d:DesignWidth="56" d:DesignHeight="180"
         x:Class="PhoneMirror.Views.FloatingToolbar"
         x:DataType="vm:FloatingToolbarViewModel"
         Title="Toolbar"
-        Width="150"
-        Height="60"
+        Width="56"
+        Height="180"
         CanResize="False"
         SystemDecorations="None"
         Topmost="True"
@@ -19,59 +19,100 @@
         <vm:FloatingToolbarViewModel/>
     </Design.DataContext>
 
-    <!-- Main container with rounded corners and semi-transparent dark background -->
-    <Border Background="#CC2D2D2D"
-            CornerRadius="8"
+    <!-- Labyrica-styled vertical toolbar -->
+    <Border Background="#F0111111"
+            CornerRadius="3"
             Padding="8"
-            BorderBrush="#55FFFFFF"
+            BorderBrush="#222222"
             BorderThickness="1">
-        <Grid RowDefinitions="Auto,Auto">
-            <!-- Button row -->
-            <StackPanel Grid.Row="0"
-                        Orientation="Horizontal"
+        <Grid RowDefinitions="Auto,*,Auto">
+
+            <!-- Drag handle / branding -->
+            <Border Grid.Row="0"
+                    Background="#19FFFFFF"
+                    CornerRadius="2"
+                    Padding="4,2"
+                    HorizontalAlignment="Center"
+                    Margin="0,0,0,12">
+                <TextBlock Text="PM"
+                           FontSize="9"
+                           FontWeight="Bold"
+                           Foreground="#999999"
+                           LetterSpacing="1"/>
+            </Border>
+
+            <!-- Action buttons -->
+            <StackPanel Grid.Row="1"
+                        Orientation="Vertical"
                         HorizontalAlignment="Center"
-                        Spacing="12">
+                        Spacing="8">
+
                 <!-- Screenshot button -->
                 <Button Command="{Binding ScreenshotCommand}"
                         ToolTip.Tip="Screenshot to clipboard"
                         Width="40"
-                        Height="32"
+                        Height="40"
                         Padding="0"
                         HorizontalContentAlignment="Center"
                         VerticalContentAlignment="Center"
-                        Background="#44FFFFFF"
-                        BorderThickness="0">
+                        Background="White"
+                        Foreground="Black"
+                        CornerRadius="3">
                     <TextBlock Text="&#xE722;"
                                FontFamily="{StaticResource SymbolThemeFontFamily}"
                                FontSize="16"
-                               Foreground="White"/>
+                               Foreground="Black"/>
                 </Button>
 
                 <!-- Copy errors button -->
                 <Button Command="{Binding CopyErrorsCommand}"
                         ToolTip.Tip="Copy recent errors"
                         Width="40"
-                        Height="32"
+                        Height="40"
                         Padding="0"
                         HorizontalContentAlignment="Center"
                         VerticalContentAlignment="Center"
-                        Background="#44FFFFFF"
-                        BorderThickness="0">
+                        Background="Transparent"
+                        BorderBrush="#333333"
+                        BorderThickness="1"
+                        CornerRadius="3">
                     <TextBlock Text="&#xE7BA;"
+                               FontFamily="{StaticResource SymbolThemeFontFamily}"
+                               FontSize="16"
+                               Foreground="White"/>
+                </Button>
+
+                <!-- Record button (placeholder for future) -->
+                <Button ToolTip.Tip="Record (coming soon)"
+                        Width="40"
+                        Height="40"
+                        Padding="0"
+                        HorizontalContentAlignment="Center"
+                        VerticalContentAlignment="Center"
+                        Background="Transparent"
+                        BorderBrush="#333333"
+                        BorderThickness="1"
+                        CornerRadius="3"
+                        IsEnabled="False"
+                        Opacity="0.5">
+                    <TextBlock Text="&#xE7C8;"
                                FontFamily="{StaticResource SymbolThemeFontFamily}"
                                FontSize="16"
                                Foreground="White"/>
                 </Button>
             </StackPanel>
 
-            <!-- Status message -->
-            <TextBlock Grid.Row="1"
+            <!-- Status message at bottom -->
+            <TextBlock Grid.Row="2"
                        Text="{Binding StatusMessage}"
-                       FontSize="10"
-                       Foreground="#BBFFFFFF"
+                       FontSize="9"
+                       Foreground="#40F99B"
                        HorizontalAlignment="Center"
-                       Margin="0,4,0,0"
-                       MaxWidth="130"
+                       TextAlignment="Center"
+                       Margin="0,12,0,0"
+                       MaxWidth="48"
+                       TextWrapping="Wrap"
+                       MaxHeight="32"
                        TextTrimming="CharacterEllipsis"/>
         </Grid>
     </Border>

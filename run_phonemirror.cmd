@@ -36,11 +36,9 @@ if %ERRORLEVEL% NEQ 0 (
 
 echo.
 echo Running PhoneMirror...
-"%DOTNET_CMD%" run --project src/PhoneMirror/PhoneMirror.csproj
+start "" "%DOTNET_CMD%" run --project src/PhoneMirror/PhoneMirror.csproj
 
-if %ERRORLEVEL% NEQ 0 (
-    echo.
-    echo Run failed!
-    pause
-    exit /b 1
-)
+echo.
+echo PhoneMirror is launching in a new window...
+echo You can close this window.
+timeout /t 2 /nobreak >nul
