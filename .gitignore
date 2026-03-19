@@ -41,5 +41,9 @@ Resources/
 # PhoneMirror embedded resource ZIPs (download separately)
 src/PhoneMirror.Core/Resources/*.zip
 
+# Release build artifacts
+publish/
+release/
+
 
 
