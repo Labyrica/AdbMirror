@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using PhoneMirror.Core.Execution;
 using PhoneMirror.Core.Platform;
 using PhoneMirror.Core.Services;
+using PhoneMirror.Services;
 using PhoneMirror.ViewModels;
 using PhoneMirror.Views;
 
@@ -39,6 +40,9 @@ public partial class App : Application
             // Initialize resource extraction (fire-and-forget for startup speed)
             var resourceExtractor = Services.GetRequiredService<IResourceExtractor>();
             _ = resourceExtractor.ExtractAllAsync();
+
+            // Auto-register MCP server in Claude Code settings
+            McpAutoRegister.EnsureRegistered();
 
             // Get MainWindowViewModel from DI container
             var mainViewModel = Services.GetRequiredService<MainWindowViewModel>();
