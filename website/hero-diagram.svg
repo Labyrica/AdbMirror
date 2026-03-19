@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" fill="none">
+  <defs>
+    <linearGradient id="glow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#40F99B" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#40F99B" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#40F99B" stop-opacity="0.8"/>
+      <stop offset="50%" stop-color="#40F99B" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#40F99B" stop-opacity="0.8"/>
+    </linearGradient>
+    <filter id="glowFilter">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="960" height="400" fill="#000000"/>
+
+  <!-- Subtle grid -->
+  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#111111" stroke-width="0.5"/>
+  </pattern>
+  <rect width="960" height="400" fill="url(#grid)"/>
+
+  <!-- ═══ Claude Code Box ═══ -->
+  <g transform="translate(60, 100)">
+    <rect width="200" height="200" rx="3" fill="#111111" stroke="#222222" stroke-width="1"/>
+    <rect width="200" height="36" rx="3" fill="#111111" stroke="#222222" stroke-width="1"/>
+    <circle cx="16" cy="18" r="4" fill="#FF3333" opacity="0.7"/>
+    <circle cx="30" cy="18" r="4" fill="#F5A623" opacity="0.7"/>
+    <circle cx="44" cy="18" r="4" fill="#40F99B" opacity="0.7"/>
+    <text x="100" y="22" text-anchor="middle" fill="#999999" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="11" letter-spacing="0.5">TERMINAL</text>
+
+    <!-- Terminal content -->
+    <text x="12" y="58" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="11">$</text>
+    <text x="24" y="58" fill="#CCCCCC" font-family="JetBrains Mono, Consolas, monospace" font-size="11">claude</text>
+    <text x="12" y="78" fill="#999999" font-family="JetBrains Mono, Consolas, monospace" font-size="10">screenshot</text>
+    <text x="12" y="93" fill="#999999" font-family="JetBrains Mono, Consolas, monospace" font-size="10">tap "Settings"</text>
+    <text x="12" y="108" fill="#999999" font-family="JetBrains Mono, Consolas, monospace" font-size="10">crash_log</text>
+    <text x="12" y="123" fill="#999999" font-family="JetBrains Mono, Consolas, monospace" font-size="10">ui_tree</text>
+    <text x="12" y="138" fill="#999999" font-family="JetBrains Mono, Consolas, monospace" font-size="10">app_logs --level error</text>
+
+    <!-- Label -->
+    <text x="100" y="180" text-anchor="middle" fill="#FFFFFF" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="13" font-weight="600" letter-spacing="1">CLAUDE CODE</text>
+    <text x="100" y="196" text-anchor="middle" fill="#999999" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="10">18 native tools</text>
+  </g>
+
+  <!-- ═══ Arrow 1: Claude → MCP ═══ -->
+  <g filter="url(#glowFilter)">
+    <line x1="270" y1="200" x2="355" y2="200" stroke="#40F99B" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.6"/>
+    <polygon points="355,194 367,200 355,206" fill="#40F99B" opacity="0.6"/>
+  </g>
+  <text x="318" y="188" text-anchor="middle" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="9" opacity="0.8">JSON-RPC</text>
+  <text x="318" y="220" text-anchor="middle" fill="#999999" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="9">stdio</text>
+
+  <!-- ═══ MCP Server Box ═══ -->
+  <g transform="translate(370, 120)">
+    <rect width="220" height="160" rx="3" fill="#111111" stroke="#40F99B" stroke-width="1" opacity="1"/>
+    <rect width="220" height="160" rx="3" fill="url(#glow)"/>
+
+    <!-- Icon area -->
+    <rect x="80" y="16" width="60" height="28" rx="2" fill="none" stroke="#40F99B" stroke-width="1" opacity="0.4"/>
+    <text x="110" y="35" text-anchor="middle" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="12" font-weight="bold">MCP</text>
+
+    <!-- Features list -->
+    <text x="110" y="68" text-anchor="middle" fill="#FFFFFF" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="13" font-weight="600" letter-spacing="1">ADB BRIDGE</text>
+
+    <text x="16" y="92" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="9">+</text>
+    <text x="28" y="92" fill="#CCCCCC" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="10">Parse UI hierarchy</text>
+    <text x="16" y="108" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="9">+</text>
+    <text x="28" y="108" fill="#CCCCCC" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="10">Filter crash traces</text>
+    <text x="16" y="124" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="9">+</text>
+    <text x="28" y="124" fill="#CCCCCC" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="10">Capture screenshots</text>
+    <text x="16" y="140" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="9">+</text>
+    <text x="28" y="140" fill="#CCCCCC" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="10">Smart element tap</text>
+  </g>
+
+  <!-- ═══ Arrow 2: MCP → Device ═══ -->
+  <g filter="url(#glowFilter)">
+    <line x1="600" y1="200" x2="685" y2="200" stroke="#40F99B" stroke-width="1.5" stroke-dasharray="6 4" opacity="0.6"/>
+    <polygon points="685,194 697,200 685,206" fill="#40F99B" opacity="0.6"/>
+  </g>
+  <text x="648" y="188" text-anchor="middle" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="9" opacity="0.8">ADB</text>
+  <text x="648" y="220" text-anchor="middle" fill="#999999" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="9">USB</text>
+
+  <!-- ═══ Phone ═══ -->
+  <g transform="translate(700, 90)">
+    <!-- Phone body -->
+    <rect width="140" height="220" rx="12" fill="#111111" stroke="#222222" stroke-width="1.5"/>
+    <!-- Screen -->
+    <rect x="8" y="28" width="124" height="170" rx="2" fill="#0a0a0a"/>
+    <!-- Notch -->
+    <rect x="50" y="8" width="40" height="6" rx="3" fill="#222222"/>
+
+    <!-- Screen content mockup -->
+    <rect x="14" y="36" width="112" height="20" rx="2" fill="#1a1a1a"/>
+    <rect x="20" y="42" width="40" height="8" rx="1" fill="#333333"/>
+    <rect x="14" y="64" width="52" height="52" rx="2" fill="#1a1a1a"/>
+    <rect x="72" y="64" width="54" height="24" rx="2" fill="#1a1a1a"/>
+    <rect x="72" y="94" width="54" height="22" rx="2" fill="#1a1a1a"/>
+    <rect x="14" y="124" width="112" height="28" rx="2" fill="#1a1a1a"/>
+    <rect x="14" y="160" width="112" height="28" rx="2" fill="#1a1a1a"/>
+
+    <!-- Tap indicator -->
+    <circle cx="98" cy="80" r="10" fill="none" stroke="#40F99B" stroke-width="1.5" opacity="0.6" filter="url(#softGlow)"/>
+    <circle cx="98" cy="80" r="3" fill="#40F99B" opacity="0.8"/>
+
+    <!-- Label -->
+    <text x="70" y="212" text-anchor="middle" fill="#999999" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="10">ANDROID DEVICE</text>
+  </g>
+
+  <!-- Bottom tagline -->
+  <text x="480" y="370" text-anchor="middle" fill="#999999" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="11" letter-spacing="2">AI-POWERED ANDROID DEBUGGING</text>
+</svg>

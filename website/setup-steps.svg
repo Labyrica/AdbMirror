@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" fill="none">
+  <rect width="960" height="300" fill="#000000"/>
+
+  <!-- Step 1 -->
+  <g transform="translate(40, 40)">
+    <rect width="270" height="220" rx="3" fill="#111111" stroke="#222222" stroke-width="1"/>
+    <!-- Number badge -->
+    <rect x="16" y="16" width="28" height="28" rx="14" fill="none" stroke="#40F99B" stroke-width="1.5"/>
+    <text x="30" y="36" text-anchor="middle" fill="#40F99B" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="14" font-weight="700">1</text>
+    <text x="56" y="36" fill="#FFFFFF" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="14" font-weight="600">Download</text>
+
+    <text x="16" y="68" fill="#999999" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="11">Grab the binary for your platform:</text>
+
+    <rect x="16" y="82" width="238" height="24" rx="2" fill="#0a0a0a" stroke="#222222" stroke-width="0.5"/>
+    <text x="26" y="99" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="10">adb-bridge-win-x64.exe</text>
+
+    <rect x="16" y="112" width="238" height="24" rx="2" fill="#0a0a0a" stroke="#222222" stroke-width="0.5"/>
+    <text x="26" y="129" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="10">adb-bridge-osx-arm64</text>
+
+    <rect x="16" y="142" width="238" height="24" rx="2" fill="#0a0a0a" stroke="#222222" stroke-width="0.5"/>
+    <text x="26" y="159" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="10">adb-bridge-linux-x64</text>
+
+    <text x="135" y="192" text-anchor="middle" fill="#666666" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="10">Windows / macOS / Linux</text>
+    <text x="135" y="208" text-anchor="middle" fill="#666666" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="10">Single binary, no dependencies</text>
+  </g>
+
+  <!-- Arrow 1→2 -->
+  <g transform="translate(320, 140)">
+    <line x1="0" y1="0" x2="30" y2="0" stroke="#40F99B" stroke-width="1" stroke-dasharray="4 3" opacity="0.4"/>
+    <polygon points="30,-4 38,0 30,4" fill="#40F99B" opacity="0.4"/>
+  </g>
+
+  <!-- Step 2 -->
+  <g transform="translate(345, 40)">
+    <rect width="270" height="220" rx="3" fill="#111111" stroke="#222222" stroke-width="1"/>
+    <rect x="16" y="16" width="28" height="28" rx="14" fill="none" stroke="#40F99B" stroke-width="1.5"/>
+    <text x="30" y="36" text-anchor="middle" fill="#40F99B" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="14" font-weight="700">2</text>
+    <text x="56" y="36" fill="#FFFFFF" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="14" font-weight="600">Configure</text>
+
+    <text x="16" y="68" fill="#999999" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="11">Add to ~/.claude/settings.json:</text>
+
+    <rect x="16" y="80" width="238" height="112" rx="2" fill="#0a0a0a" stroke="#222222" stroke-width="0.5"/>
+    <text x="26" y="98" fill="#666666" font-family="JetBrains Mono, Consolas, monospace" font-size="10">{</text>
+    <text x="36" y="114" fill="#CCCCCC" font-family="JetBrains Mono, Consolas, monospace" font-size="10">"mcpServers"</text><text x="140" y="114" fill="#666666" font-family="JetBrains Mono, Consolas, monospace" font-size="10">: {</text>
+    <text x="46" y="130" fill="#CCCCCC" font-family="JetBrains Mono, Consolas, monospace" font-size="10">"adb-bridge"</text><text x="140" y="130" fill="#666666" font-family="JetBrains Mono, Consolas, monospace" font-size="10">: {</text>
+    <text x="56" y="146" fill="#CCCCCC" font-family="JetBrains Mono, Consolas, monospace" font-size="10">"command"</text><text x="122" y="146" fill="#666666" font-family="JetBrains Mono, Consolas, monospace" font-size="10">:</text><text x="132" y="146" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="10">"path/to/exe"</text>
+    <text x="36" y="162" fill="#666666" font-family="JetBrains Mono, Consolas, monospace" font-size="10">} } }</text>
+
+    <text x="135" y="208" text-anchor="middle" fill="#666666" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="10">Or click the copy button in the app</text>
+  </g>
+
+  <!-- Arrow 2→3 -->
+  <g transform="translate(625, 140)">
+    <line x1="0" y1="0" x2="30" y2="0" stroke="#40F99B" stroke-width="1" stroke-dasharray="4 3" opacity="0.4"/>
+    <polygon points="30,-4 38,0 30,4" fill="#40F99B" opacity="0.4"/>
+  </g>
+
+  <!-- Step 3 -->
+  <g transform="translate(650, 40)">
+    <rect width="270" height="220" rx="3" fill="#111111" stroke="#40F99B" stroke-width="1" stroke-opacity="0.3"/>
+    <rect width="270" height="220" rx="3" fill="url(#cardGlow)" xmlns:xlink="http://www.w3.org/1999/xlink"/>
+    <rect x="16" y="16" width="28" height="28" rx="14" fill="#40F99B" fill-opacity="0.15" stroke="#40F99B" stroke-width="1.5"/>
+    <text x="30" y="36" text-anchor="middle" fill="#40F99B" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="14" font-weight="700">3</text>
+    <text x="56" y="36" fill="#FFFFFF" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="14" font-weight="600">Use</text>
+
+    <text x="16" y="68" fill="#999999" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="11">Tools appear natively in Claude Code:</text>
+
+    <rect x="16" y="80" width="238" height="120" rx="2" fill="#0a0a0a" stroke="#222222" stroke-width="0.5"/>
+    <text x="26" y="100" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="10">$</text>
+    <text x="38" y="100" fill="#CCCCCC" font-family="JetBrains Mono, Consolas, monospace" font-size="10">claude</text>
+    <text x="26" y="120" fill="#999999" font-family="JetBrains Mono, Consolas, monospace" font-size="10">You: Take a screenshot and</text>
+    <text x="26" y="134" fill="#999999" font-family="JetBrains Mono, Consolas, monospace" font-size="10">tap the Settings button</text>
+    <text x="26" y="156" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="10">Claude: Using screenshot...</text>
+    <text x="26" y="170" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="10">        Using tap "Settings"...</text>
+    <text x="26" y="188" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="10">        Done.</text>
+
+    <text x="135" y="214" text-anchor="middle" fill="#40F99B" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="10" opacity="0.8">Just ask. Claude handles the rest.</text>
+  </g>
+
+  <defs>
+    <linearGradient id="cardGlow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#40F99B" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#40F99B" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+</svg>

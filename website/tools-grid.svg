@@ -1,0 +1,176 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 520" fill="none">
+  <defs>
+    <linearGradient id="cardGlow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#40F99B" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#40F99B" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="960" height="520" fill="#000000"/>
+
+  <!-- Title -->
+  <text x="480" y="44" text-anchor="middle" fill="#FFFFFF" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="20" font-weight="600" letter-spacing="1">18 NATIVE TOOLS FOR CLAUDE CODE</text>
+  <text x="480" y="66" text-anchor="middle" fill="#999999" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="12">Every tool appears alongside Read, Write, and Grep — no Bash wrappers needed</text>
+
+  <!-- Row 1 — Vision -->
+  <g transform="translate(20, 90)">
+    <!-- Section label -->
+    <text x="0" y="14" fill="#40F99B" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="10" font-weight="600" letter-spacing="2">VISION</text>
+
+    <!-- screenshot -->
+    <g transform="translate(0, 24)">
+      <rect width="220" height="64" rx="3" fill="#111111" stroke="#222222" stroke-width="1"/>
+      <rect width="220" height="64" rx="3" fill="url(#cardGlow)"/>
+      <text x="14" y="24" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="12" font-weight="600">screenshot</text>
+      <text x="14" y="44" fill="#999999" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="10">Capture device screen as PNG</text>
+      <text x="14" y="56" fill="#666666" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="9">Returns base64 image to Claude</text>
+    </g>
+
+    <!-- ui_tree -->
+    <g transform="translate(230, 24)">
+      <rect width="220" height="64" rx="3" fill="#111111" stroke="#222222" stroke-width="1"/>
+      <text x="14" y="24" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="12" font-weight="600">ui_tree</text>
+      <text x="14" y="44" fill="#999999" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="10">UI element hierarchy</text>
+      <text x="14" y="56" fill="#666666" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="9">Text, bounds, clickable, resource IDs</text>
+    </g>
+
+    <!-- pixel_color -->
+    <g transform="translate(460, 24)">
+      <rect width="220" height="64" rx="3" fill="#111111" stroke="#222222" stroke-width="1"/>
+      <text x="14" y="24" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="12" font-weight="600">pixel_color</text>
+      <text x="14" y="44" fill="#999999" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="10">Sample pixel at coordinates</text>
+      <text x="14" y="56" fill="#666666" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="9">RGB, hex, luminance, is_dark</text>
+    </g>
+
+    <!-- screen_record -->
+    <g transform="translate(690, 24)">
+      <rect width="220" height="64" rx="3" fill="#111111" stroke="#222222" stroke-width="1"/>
+      <text x="14" y="24" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="12" font-weight="600">screen_record</text>
+      <text x="14" y="44" fill="#999999" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="10">Record screen to MP4</text>
+      <text x="14" y="56" fill="#666666" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="9">Up to 180 seconds</text>
+    </g>
+  </g>
+
+  <!-- Row 2 — Interaction -->
+  <g transform="translate(20, 200)">
+    <text x="0" y="14" fill="#40F99B" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="10" font-weight="600" letter-spacing="2">INTERACTION</text>
+
+    <!-- tap -->
+    <g transform="translate(0, 24)">
+      <rect width="220" height="64" rx="3" fill="#111111" stroke="#40F99B" stroke-width="1" stroke-opacity="0.3"/>
+      <rect width="220" height="64" rx="3" fill="url(#cardGlow)"/>
+      <text x="14" y="24" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="12" font-weight="600">tap</text>
+      <text x="14" y="44" fill="#999999" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="10">Tap by text, desc, ID, or coords</text>
+      <text x="14" y="56" fill="#666666" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="9">Long press, double tap supported</text>
+    </g>
+
+    <!-- swipe -->
+    <g transform="translate(230, 24)">
+      <rect width="220" height="64" rx="3" fill="#111111" stroke="#222222" stroke-width="1"/>
+      <text x="14" y="24" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="12" font-weight="600">swipe</text>
+      <text x="14" y="44" fill="#999999" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="10">Swipe by direction or coords</text>
+      <text x="14" y="56" fill="#666666" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="9">up, down, left, right</text>
+    </g>
+
+    <!-- input_text -->
+    <g transform="translate(460, 24)">
+      <rect width="220" height="64" rx="3" fill="#111111" stroke="#222222" stroke-width="1"/>
+      <text x="14" y="24" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="12" font-weight="600">input_text</text>
+      <text x="14" y="44" fill="#999999" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="10">Type into focused field</text>
+      <text x="14" y="56" fill="#666666" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="9">Auto-escapes special characters</text>
+    </g>
+
+    <!-- press_key -->
+    <g transform="translate(690, 24)">
+      <rect width="220" height="64" rx="3" fill="#111111" stroke="#222222" stroke-width="1"/>
+      <text x="14" y="24" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="12" font-weight="600">press_key</text>
+      <text x="14" y="44" fill="#999999" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="10">Press device keys</text>
+      <text x="14" y="56" fill="#666666" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="9">back, home, enter, volume, power</text>
+    </g>
+  </g>
+
+  <!-- Row 3 — Diagnostics -->
+  <g transform="translate(20, 310)">
+    <text x="0" y="14" fill="#40F99B" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="10" font-weight="600" letter-spacing="2">DIAGNOSTICS</text>
+
+    <!-- crash_log -->
+    <g transform="translate(0, 24)">
+      <rect width="220" height="64" rx="3" fill="#111111" stroke="#FF3333" stroke-width="1" stroke-opacity="0.3"/>
+      <text x="14" y="24" fill="#FF3333" font-family="JetBrains Mono, Consolas, monospace" font-size="12" font-weight="600">crash_log</text>
+      <text x="14" y="44" fill="#999999" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="10">FATAL EXCEPTION + ANR traces</text>
+      <text x="14" y="56" fill="#666666" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="9">Parsed stack traces with timestamps</text>
+    </g>
+
+    <!-- app_logs -->
+    <g transform="translate(230, 24)">
+      <rect width="220" height="64" rx="3" fill="#111111" stroke="#222222" stroke-width="1"/>
+      <text x="14" y="24" fill="#F5A623" font-family="JetBrains Mono, Consolas, monospace" font-size="12" font-weight="600">app_logs</text>
+      <text x="14" y="44" fill="#999999" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="10">Filtered logcat output</text>
+      <text x="14" y="56" fill="#666666" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="9">Package, level, time, regex filter</text>
+    </g>
+
+    <!-- app_status -->
+    <g transform="translate(460, 24)">
+      <rect width="220" height="64" rx="3" fill="#111111" stroke="#222222" stroke-width="1"/>
+      <text x="14" y="24" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="12" font-weight="600">app_status</text>
+      <text x="14" y="44" fill="#999999" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="10">Running state, PID, memory</text>
+      <text x="14" y="56" fill="#666666" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="9">foreground / background / stopped</text>
+    </g>
+
+    <!-- performance_snapshot -->
+    <g transform="translate(690, 24)">
+      <rect width="220" height="64" rx="3" fill="#111111" stroke="#222222" stroke-width="1"/>
+      <text x="14" y="24" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="12" font-weight="600">performance_snapshot</text>
+      <text x="14" y="44" fill="#999999" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="10">FPS, janky frames, memory</text>
+      <text x="14" y="56" fill="#666666" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="9">Native heap, Java heap breakdown</text>
+    </g>
+  </g>
+
+  <!-- Row 4 — Management -->
+  <g transform="translate(20, 420)">
+    <text x="0" y="14" fill="#40F99B" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="10" font-weight="600" letter-spacing="2">MANAGEMENT</text>
+
+    <!-- device_info -->
+    <g transform="translate(0, 24)">
+      <rect width="143" height="52" rx="3" fill="#111111" stroke="#222222" stroke-width="1"/>
+      <text x="10" y="22" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="11" font-weight="600">device_info</text>
+      <text x="10" y="40" fill="#666666" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="9">Model, OS, screen, battery</text>
+    </g>
+
+    <!-- install_apk -->
+    <g transform="translate(153, 24)">
+      <rect width="143" height="52" rx="3" fill="#111111" stroke="#222222" stroke-width="1"/>
+      <text x="10" y="22" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="11" font-weight="600">install_apk</text>
+      <text x="10" y="40" fill="#666666" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="9">Install + grant permissions</text>
+    </g>
+
+    <!-- launch_app -->
+    <g transform="translate(306, 24)">
+      <rect width="143" height="52" rx="3" fill="#111111" stroke="#222222" stroke-width="1"/>
+      <text x="10" y="22" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="11" font-weight="600">launch_app</text>
+      <text x="10" y="40" fill="#666666" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="9">Launch by package name</text>
+    </g>
+
+    <!-- force_stop -->
+    <g transform="translate(459, 24)">
+      <rect width="143" height="52" rx="3" fill="#111111" stroke="#222222" stroke-width="1"/>
+      <text x="10" y="22" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="11" font-weight="600">force_stop</text>
+      <text x="10" y="40" fill="#666666" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="9">Kill app by package</text>
+    </g>
+
+    <!-- list_packages -->
+    <g transform="translate(612, 24)">
+      <rect width="143" height="52" rx="3" fill="#111111" stroke="#222222" stroke-width="1"/>
+      <text x="10" y="22" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="11" font-weight="600">list_packages</text>
+      <text x="10" y="40" fill="#666666" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="9">List + filter installed apps</text>
+    </g>
+
+    <!-- shell -->
+    <g transform="translate(765, 24)">
+      <rect width="143" height="52" rx="3" fill="#111111" stroke="#222222" stroke-width="1"/>
+      <text x="10" y="22" fill="#40F99B" font-family="JetBrains Mono, Consolas, monospace" font-size="11" font-weight="600">shell</text>
+      <text x="10" y="40" fill="#666666" font-family="Inter, -apple-system, system-ui, sans-serif" font-size="9">Any ADB shell command</text>
+    </g>
+  </g>
+</svg>

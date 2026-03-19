@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADB Bridge — Claude Code meets Android</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #000000;
+    --surface: #111111;
+    --border: #222222;
+    --border2: #333333;
+    --text: #FFFFFF;
+    --text2: #999999;
+    --text3: #666666;
+    --accent: #40F99B;
+    --error: #FF3333;
+    --warning: #F5A623;
+    --mono: 'JetBrains Mono', 'Consolas', monospace;
+    --sans: 'Inter', -apple-system, system-ui, sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── Hero ─── */
+  .hero {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 80px 40px 60px;
+    text-align: center;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    border: 1px solid var(--accent);
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--accent);
+    margin-bottom: 32px;
+    opacity: 0.8;
+  }
+
+  .hero h1 {
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    letter-spacing: -1px;
+  }
+
+  .hero h1 span { color: var(--accent); }
+
+  .hero p {
+    font-size: 18px;
+    color: var(--text2);
+    max-width: 600px;
+    margin: 0 auto 40px;
+    line-height: 1.6;
+  }
+
+  .hero-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    padding: 14px 32px;
+    border-radius: 3px;
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.15s;
+  }
+
+  .btn-primary {
+    background: white;
+    color: black;
+    border: none;
+  }
+  .btn-primary:hover { background: #e6e6e6; }
+
+  .btn-secondary {
+    background: transparent;
+    color: white;
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { border-color: var(--border2); background: rgba(255,255,255,0.03); }
+
+  /* ─── Sections ─── */
+  section {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 60px 40px;
+  }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .section-desc {
+    font-size: 14px;
+    color: var(--text2);
+    margin-bottom: 40px;
+  }
+
+  /* ─── Diagram Section ─── */
+  .diagram-section { padding-bottom: 0; }
+  .diagram-section img, .diagram-section object {
+    width: 100%;
+    margin-top: 20px;
+  }
+
+  /* ─── Demo Section — Fake Terminal ─── */
+  .terminal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .terminal-bar {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    gap: 8px;
+  }
+
+  .terminal-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .terminal-body {
+    padding: 20px 24px;
+    max-height: 480px;
+    overflow-y: auto;
+  }
+
+  .t-prompt { color: var(--accent); }
+  .t-cmd { color: #CCCCCC; }
+  .t-comment { color: var(--text3); font-style: italic; }
+  .t-tool { color: var(--accent); opacity: 0.7; }
+  .t-result { color: var(--text2); }
+  .t-error { color: var(--error); }
+  .t-dim { color: #444; }
+  .t-line { margin: 2px 0; }
+  .t-gap { height: 12px; }
+
+  /* ─── Features Grid ─── */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+  }
+
+  .feature-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 20px;
+    transition: border-color 0.15s;
+  }
+
+  .feature-card:hover { border-color: var(--border2); }
+
+  .feature-card .name {
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .feature-card .desc {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.5;
+  }
+
+  .feature-card .tag {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+
+  .tag-vision { background: rgba(64,249,155,0.1); color: var(--accent); }
+  .tag-interact { background: rgba(245,166,35,0.1); color: var(--warning); }
+  .tag-diag { background: rgba(255,51,51,0.1); color: var(--error); }
+  .tag-manage { background: rgba(255,255,255,0.05); color: var(--text2); }
+
+  /* ─── Setup Steps ─── */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  @media (max-width: 768px) { .steps { grid-template-columns: 1fr; } }
+
+  .step {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 24px;
+  }
+
+  .step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1.5px solid var(--accent);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  .step h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .step p {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.5;
+  }
+
+  .step code {
+    display: block;
+    margin-top: 12px;
+    padding: 12px;
+    background: #0a0a0a;
+    border-radius: 2px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    white-space: pre;
+    overflow-x: auto;
+    line-height: 1.6;
+  }
+
+  /* ─── Platform badges ─── */
+  .platforms {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin: 40px 0;
+    flex-wrap: wrap;
+  }
+
+  .platform-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    font-size: 13px;
+    color: var(--text2);
+  }
+
+  .platform-badge svg { width: 18px; height: 18px; fill: var(--text2); }
+
+  /* ─── App Screenshots ─── */
+  .screenshots-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+
+  @media (max-width: 768px) { .screenshots-grid { grid-template-columns: 1fr; } }
+
+  .screenshot-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+
+  .screenshot-card:hover { border-color: var(--border2); }
+
+  .screenshot-card img {
+    width: 100%;
+    display: block;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .screenshot-card .caption {
+    padding: 14px 18px;
+  }
+
+  .screenshot-card .caption h4 {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .screenshot-card .caption p {
+    font-size: 11px;
+    color: var(--text3);
+    line-height: 1.5;
+  }
+
+  /* ─── Footer ─── */
+  footer {
+    text-align: center;
+    padding: 60px 40px 40px;
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+  }
+
+  footer p {
+    font-size: 12px;
+    color: var(--text3);
+    letter-spacing: 1px;
+  }
+
+  footer a { color: var(--text2); text-decoration: none; }
+  footer a:hover { color: var(--text); }
+
+  /* ─── Divider ─── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ HERO ═══════════ -->
+<div class="hero">
+  <div class="hero-badge">NEW IN V2.0</div>
+  <h1>Give Claude Code<br><span>eyes and hands</span><br>on your phone</h1>
+  <p>ADB Bridge is an MCP server that lets Claude Code see your Android screen, tap buttons, read crash logs, and debug your app — all as native tools.</p>
+  <div class="hero-buttons">
+    <a href="#" class="btn btn-primary">Download v2.0</a>
+    <a href="#" class="btn btn-secondary">View on GitHub</a>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══════════ HOW IT WORKS ═══════════ -->
+<section class="diagram-section">
+  <div class="section-label">HOW IT WORKS</div>
+  <div class="section-title">Three components, one stdio pipe</div>
+  <div class="section-desc">Claude Code launches the MCP server automatically. It communicates via JSON-RPC over stdin/stdout — the same protocol used by all MCP tools.</div>
+  <img src="hero-diagram.svg" alt="Architecture: Claude Code → MCP Server → ADB → Android Device">
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════ LIVE DEMO ═══════════ -->
+<section>
+  <div class="section-label">IN ACTION</div>
+  <div class="section-title">A real debugging session</div>
+  <div class="section-desc">Claude can see the screen, find UI elements by text, check for crashes, and verify fixes — all in one conversation.</div>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="terminal-dot" style="background:#FF3333"></div>
+      <div class="terminal-dot" style="background:#F5A623"></div>
+      <div class="terminal-dot" style="background:#40F99B"></div>
+      <span style="font-size:11px;color:#666;margin-left:8px;font-family:var(--sans)">claude</span>
+    </div>
+    <div class="terminal-body">
+<div class="t-line"><span class="t-prompt">you:</span> <span class="t-cmd">The app crashes when I tap the Night mode button. Can you debug it?</span></div>
+<div class="t-gap"></div>
+<div class="t-line"><span class="t-prompt">claude:</span> <span class="t-result">Let me take a look at the device.</span></div>
+<div class="t-gap"></div>
+<div class="t-line"><span class="t-tool">  ● Using screenshot</span></div>
+<div class="t-line"><span class="t-dim">    ↳ Captured 1116x2480 PNG</span></div>
+<div class="t-gap"></div>
+<div class="t-line"><span class="t-result">  I can see the app is on the main screen. Let me tap Night mode and check for crashes.</span></div>
+<div class="t-gap"></div>
+<div class="t-line"><span class="t-tool">  ● Using tap</span> <span class="t-dim">text="Night"</span></div>
+<div class="t-line"><span class="t-dim">    ↳ Tapped at (850, 470) — element: text="Night", class=TextView</span></div>
+<div class="t-gap"></div>
+<div class="t-line"><span class="t-tool">  ● Using app_status</span> <span class="t-dim">package="com.app.explorer"</span></div>
+<div class="t-line"><span class="t-error">    ↳ Running: false, State: stopped</span></div>
+<div class="t-gap"></div>
+<div class="t-line"><span class="t-result">  The app crashed. Let me get the crash trace.</span></div>
+<div class="t-gap"></div>
+<div class="t-line"><span class="t-tool">  ● Using crash_log</span> <span class="t-dim">package="com.app.explorer"</span></div>
+<div class="t-line"><span class="t-error">    ↳ FATAL EXCEPTION: main</span></div>
+<div class="t-line"><span class="t-error">      java.lang.NullPointerException: Attempt to invoke</span></div>
+<div class="t-line"><span class="t-error">      virtual method on null object reference</span></div>
+<div class="t-line"><span class="t-error">        at com.app.explorer.ThemeManager.applyNightMode(ThemeManager.kt:47)</span></div>
+<div class="t-gap"></div>
+<div class="t-line"><span class="t-result">  Found it — <code style="display:inline;padding:2px 6px;background:#1a1a1a;border-radius:2px;font-size:12px">ThemeManager.kt:47</code> has a null reference when applying night mode.</span></div>
+<div class="t-line"><span class="t-result">  The <code style="display:inline;padding:2px 6px;background:#1a1a1a;border-radius:2px;font-size:12px">colorScheme</code> property isn't initialized before the toggle is called. Let me fix it.</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════ TOOLS ═══════════ -->
+<section>
+  <div class="section-label">18 TOOLS</div>
+  <div class="section-title">Everything Claude needs to work with your device</div>
+  <div class="section-desc">Each tool appears natively in Claude Code — no Bash commands, no curl wrappers.</div>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="name">screenshot</div>
+      <div class="desc">Capture the device screen and return as a PNG image that Claude can see and analyze.</div>
+      <span class="tag tag-vision">VISION</span>
+    </div>
+    <div class="feature-card">
+      <div class="name">tap</div>
+      <div class="desc">Find UI elements by text, content description, or resource ID and tap them. Supports long press and double tap.</div>
+      <span class="tag tag-interact">INTERACTION</span>
+    </div>
+    <div class="feature-card">
+      <div class="name">crash_log</div>
+      <div class="desc">Extract FATAL EXCEPTION, ANR, and native crash traces with parsed stack traces and timestamps.</div>
+      <span class="tag tag-diag">DIAGNOSTICS</span>
+    </div>
+    <div class="feature-card">
+      <div class="name">ui_tree</div>
+      <div class="desc">Get the full UI hierarchy with text, bounds, clickable state, and resource IDs for every element on screen.</div>
+      <span class="tag tag-vision">VISION</span>
+    </div>
+    <div class="feature-card">
+      <div class="name">app_logs</div>
+      <div class="desc">Filtered logcat output by package, log level, time window, and regex pattern. Up to 200 lines.</div>
+      <span class="tag tag-diag">DIAGNOSTICS</span>
+    </div>
+    <div class="feature-card">
+      <div class="name">swipe</div>
+      <div class="desc">Swipe by exact coordinates or simply say "up", "down", "left", "right" from screen center.</div>
+      <span class="tag tag-interact">INTERACTION</span>
+    </div>
+    <div class="feature-card">
+      <div class="name">input_text</div>
+      <div class="desc">Type text into the focused field. Auto-escapes special characters for ADB compatibility.</div>
+      <span class="tag tag-interact">INTERACTION</span>
+    </div>
+    <div class="feature-card">
+      <div class="name">press_key</div>
+      <div class="desc">Press device keys: back, home, enter, menu, volume, power, tab, delete, escape.</div>
+      <span class="tag tag-interact">INTERACTION</span>
+    </div>
+    <div class="feature-card">
+      <div class="name">app_status</div>
+      <div class="desc">Check if an app is running, foreground or background, its PID, and memory usage.</div>
+      <span class="tag tag-diag">DIAGNOSTICS</span>
+    </div>
+    <div class="feature-card">
+      <div class="name">device_info</div>
+      <div class="desc">Model, manufacturer, Android version, screen resolution, density, battery level, storage.</div>
+      <span class="tag tag-manage">MANAGEMENT</span>
+    </div>
+    <div class="feature-card">
+      <div class="name">install_apk</div>
+      <div class="desc">Install APK files with auto-granted runtime permissions. Replace existing installs.</div>
+      <span class="tag tag-manage">MANAGEMENT</span>
+    </div>
+    <div class="feature-card">
+      <div class="name">performance_snapshot</div>
+      <div class="desc">FPS, janky frames percentage, total/native/Java heap memory breakdown.</div>
+      <span class="tag tag-diag">DIAGNOSTICS</span>
+    </div>
+    <div class="feature-card">
+      <div class="name">pixel_color</div>
+      <div class="desc">Sample pixel color at any coordinate. Returns hex, RGB, luminance, and dark/light classification.</div>
+      <span class="tag tag-vision">VISION</span>
+    </div>
+    <div class="feature-card">
+      <div class="name">launch_app</div>
+      <div class="desc">Launch any app by package name. No need to know the activity — uses the app launcher.</div>
+      <span class="tag tag-manage">MANAGEMENT</span>
+    </div>
+    <div class="feature-card">
+      <div class="name">shell</div>
+      <div class="desc">Run any ADB shell command for advanced operations not covered by the other tools.</div>
+      <span class="tag tag-manage">MANAGEMENT</span>
+    </div>
+    <div class="feature-card">
+      <div class="name">screen_record</div>
+      <div class="desc">Record the device screen to MP4. Up to 180 seconds. Saved to a local file path.</div>
+      <span class="tag tag-vision">VISION</span>
+    </div>
+    <div class="feature-card">
+      <div class="name">list_packages</div>
+      <div class="desc">List installed packages filtered by name. Show third-party only or all apps.</div>
+      <span class="tag tag-manage">MANAGEMENT</span>
+    </div>
+    <div class="feature-card">
+      <div class="name">force_stop</div>
+      <div class="desc">Force stop a running app by package name. Useful for restart-and-test cycles.</div>
+      <span class="tag tag-manage">MANAGEMENT</span>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════ APP SCREENSHOTS ═══════════ -->
+<section>
+  <div class="section-label">THE APP</div>
+  <div class="section-title">Minimal, focused, dark</div>
+  <div class="section-desc">Built with the Labyrica design language. Everything you need, nothing you don't.</div>
+
+  <div class="screenshots-grid">
+    <div class="screenshot-card">
+      <img src="app-main.png" alt="Phone Mirror — main view with device connected">
+      <div class="caption">
+        <h4>Device Connected</h4>
+        <p>Auto-detects your Android device. One click to start mirroring. Quality presets for any connection speed.</p>
+      </div>
+    </div>
+    <div class="screenshot-card">
+      <img src="app-mcp-copied.png" alt="Phone Mirror — MCP setup copied to clipboard">
+      <div class="caption">
+        <h4>One-Click MCP Setup</h4>
+        <p>Click the copy button to get the Claude Code MCP configuration. Paste into settings.json and you're done.</p>
+      </div>
+    </div>
+    <div class="screenshot-card">
+      <img src="app-settings.png" alt="Phone Mirror — settings panel showing ADB and scrcpy paths">
+      <div class="caption">
+        <h4>Settings</h4>
+        <p>Shows resolved ADB and scrcpy paths. Auto-discovers from PATH, ANDROID_HOME, or bundled binaries.</p>
+      </div>
+    </div>
+    <div class="screenshot-card">
+      <img src="app-logs.png" alt="Phone Mirror — logs panel for error monitoring">
+      <div class="caption">
+        <h4>Live Error Log</h4>
+        <p>Real-time logcat error capture during mirroring sessions. Copy to clipboard for quick debugging.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ═══════════ SETUP ═══════════ -->
+<section>
+  <div class="section-label">GET STARTED</div>
+  <div class="section-title">Three steps to AI-powered Android debugging</div>
+  <div class="section-desc">Works with any Claude Code project. No SDK changes required.</div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h3>Download</h3>
+      <p>Grab the single-file binary for your platform. No dependencies needed — the .NET runtime is bundled.</p>
+      <code>adb-bridge-win-x64.exe
+adb-bridge-osx-arm64
+adb-bridge-linux-x64</code>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3>Configure</h3>
+      <p>Add one block to your Claude Code settings. Or click the copy button in the PhoneMirror app.</p>
+      <code>{
+  "mcpServers": {
+    "adb-bridge": {
+      "command": "path/to/adb-bridge"
+    }
+  }
+}</code>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3>Ask Claude</h3>
+      <p>The tools appear automatically. Just describe what you want — Claude handles the ADB commands.</p>
+      <code>$ claude
+you: Take a screenshot and
+     check for crashes
+claude: Using screenshot...
+        Using crash_log...
+        Done.</code>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ PLATFORMS ═══════════ -->
+<div class="platforms">
+  <div class="platform-badge">
+    <svg viewBox="0 0 24 24"><path d="M3 5.5L12 1l9 4.5v5c0 5.5-3.8 10.7-9 12-5.2-1.3-9-6.5-9-12v-5z"/></svg>
+    Windows x64
+  </div>
+  <div class="platform-badge">
+    <svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83"/></svg>
+    macOS Intel &amp; Apple Silicon
+  </div>
+  <div class="platform-badge">
+    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+    Linux x64
+  </div>
+</div>
+
+<footer>
+  <p>Built by <a href="https://labyrica.com">LABYRICA</a> — Data driven solutions</p>
+</footer>
+
+</body>
+</html>
