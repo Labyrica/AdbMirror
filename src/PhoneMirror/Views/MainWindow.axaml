@@ -325,7 +325,8 @@
                 CornerRadius="3"
                 Padding="12"
                 Margin="0,12,0,0"
-                Height="180"
+                MinHeight="200"
+                MaxHeight="350"
                 IsVisible="{Binding IsLogsVisible}">
             <Grid RowDefinitions="Auto,*">
                 <Grid Grid.Row="0" Margin="0,0,0,8">

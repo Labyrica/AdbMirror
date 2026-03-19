@@ -117,7 +117,7 @@ public partial class FloatingToolbarViewModel : ViewModelBase
 
         // Format errors as text (timestamp, level, tag, message - one per line)
         var sb = new StringBuilder();
-        sb.AppendLine($"=== {recentErrors.Count} Recent Errors (last 10 seconds) ===");
+        sb.AppendLine($"=== {recentErrors.Count} Recent Errors (last 60 seconds) ===");
         sb.AppendLine();
 
         foreach (var entry in recentErrors)

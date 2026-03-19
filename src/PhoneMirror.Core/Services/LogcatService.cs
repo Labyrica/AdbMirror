@@ -25,14 +25,30 @@ public sealed class LogcatService : ILogcatService
     /// <summary>
     /// Time window for "recent" errors in seconds.
     /// </summary>
-    private const int RecentWindowSeconds = 10;
+    private const int RecentWindowSeconds = 60;
 
     /// <summary>
-    /// Regex to parse logcat output format: "01-15 12:34:56.789 E/Tag: message"
+    /// Regex to parse logcat threadtime format: "03-19 20:30:45.123  1234  5678 E Tag     : message"
     /// Groups: 1=timestamp, 2=level, 3=tag, 4=message
     /// </summary>
-    private static readonly Regex LogcatLineRegex = new(
+    private static readonly Regex ThreadtimeRegex = new(
+        @"^(\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d{3})\s+\d+\s+\d+\s+([VDIWEF])\s+(\S+)\s*:\s*(.*)$",
+        RegexOptions.Compiled);
+
+    /// <summary>
+    /// Regex to parse logcat brief/tag format: "01-15 12:34:56.789 E/Tag: message"
+    /// Groups: 1=timestamp, 2=level, 3=tag, 4=message
+    /// </summary>
+    private static readonly Regex BriefRegex = new(
         @"^(\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d{3})\s+([VDIWEF])/([^:]+):\s*(.*)$",
+        RegexOptions.Compiled);
+
+    /// <summary>
+    /// Fallback regex for lines that have at least a level indicator.
+    /// Captures the whole line as the message.
+    /// </summary>
+    private static readonly Regex FallbackRegex = new(
+        @"([VDIWEF])/([^:(]+)(?:\(\s*\d+\))?:\s*(.*)$",
         RegexOptions.Compiled);
 
     /// <inheritdoc />
@@ -212,40 +228,89 @@ public sealed class LogcatService : ILogcatService
 
     /// <summary>
     /// Parses a logcat line and adds it to the circular buffer.
+    /// Supports threadtime, brief, and tag formats.
     /// </summary>
     /// <param name="line">The raw logcat line.</param>
     private void ParseAndAddEntry(string line)
     {
-        var match = LogcatLineRegex.Match(line);
-        if (!match.Success)
+        string? timestampStr = null;
+        string level;
+        string tag;
+        string message;
+
+        // Try threadtime format first (most common default):
+        // "03-19 20:30:45.123  1234  5678 E Tag     : message"
+        var match = ThreadtimeRegex.Match(line);
+        if (match.Success)
         {
-            // Line doesn't match expected format, skip it
-            return;
+            timestampStr = match.Groups[1].Value;
+            level = match.Groups[2].Value;
+            tag = match.Groups[3].Value.Trim();
+            message = match.Groups[4].Value;
+        }
+        else
+        {
+            // Try brief/tag format: "01-15 12:34:56.789 E/Tag: message"
+            match = BriefRegex.Match(line);
+            if (match.Success)
+            {
+                timestampStr = match.Groups[1].Value;
+                level = match.Groups[2].Value;
+                tag = match.Groups[3].Value.Trim();
+                message = match.Groups[4].Value;
+            }
+            else
+            {
+                // Fallback: "E/Tag(1234): message" or "E/Tag: message"
+                match = FallbackRegex.Match(line);
+                if (match.Success)
+                {
+                    level = match.Groups[1].Value;
+                    tag = match.Groups[2].Value.Trim();
+                    message = match.Groups[3].Value;
+                }
+                else
+                {
+                    // Completely unrecognized format — still capture it as raw
+                    if (line.Length > 5 && !line.StartsWith("-----"))
+                    {
+                        var entry = new LogcatEntry(DateTime.UtcNow, "E", "raw", line);
+                        EnqueueEntry(entry);
+                    }
+                    return;
+                }
+            }
         }
 
-        var timestampStr = match.Groups[1].Value;
-        var level = match.Groups[2].Value;
-        var tag = match.Groups[3].Value.Trim();
-        var message = match.Groups[4].Value;
-
-        // Parse the timestamp - format is "MM-dd HH:mm:ss.fff"
-        // We'll use current year since logcat doesn't include it
-        var now = DateTime.UtcNow;
-        if (DateTime.TryParseExact(
-            $"{now.Year}-{timestampStr}",
-            "yyyy-MM-dd HH:mm:ss.fff",
-            System.Globalization.CultureInfo.InvariantCulture,
-            System.Globalization.DateTimeStyles.AssumeUniversal,
-            out var timestamp))
+        // Parse the timestamp if we have one
+        DateTime timestamp;
+        if (timestampStr != null)
         {
-            var entry = new LogcatEntry(timestamp, level, tag, message);
-            _entries.Enqueue(entry);
-
-            // Enforce circular buffer max size
-            while (_entries.Count > MaxEntries)
+            var now = DateTime.UtcNow;
+            if (!DateTime.TryParseExact(
+                $"{now.Year}-{timestampStr}",
+                "yyyy-MM-dd HH:mm:ss.fff",
+                System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.AssumeUniversal,
+                out timestamp))
             {
-                _entries.TryDequeue(out _);
+                timestamp = DateTime.UtcNow;
             }
+        }
+        else
+        {
+            timestamp = DateTime.UtcNow;
+        }
+
+        EnqueueEntry(new LogcatEntry(timestamp, level, tag, message));
+    }
+
+    private void EnqueueEntry(LogcatEntry entry)
+    {
+        _entries.Enqueue(entry);
+        while (_entries.Count > MaxEntries)
+        {
+            _entries.TryDequeue(out _);
         }
     }
 }

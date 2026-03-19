@@ -749,10 +749,16 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
             LogMessages.Add($"[{entry.Timestamp:HH:mm:ss}] {entry.Tag}: {entry.Message}");
         }
 
-        // Notify count changed if entries were added
+        // Notify count changed if entries were added, and auto-show logs panel
         if (LogEntries.Count != currentCount)
         {
             OnPropertyChanged(nameof(LogEntryCountText));
+
+            // Auto-show logs panel when first errors arrive
+            if (!IsLogsVisible && LogEntries.Count > 0)
+            {
+                IsLogsVisible = true;
+            }
         }
     }
 
