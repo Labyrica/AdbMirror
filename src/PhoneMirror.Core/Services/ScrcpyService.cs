@@ -259,14 +259,30 @@ public sealed class ScrcpyService : IScrcpyService
             return extractedPath;
         }
 
+        // 2. AppData tools directory (auto-downloaded by DependencyManager)
+        var appDataPath = _platformService.GetAppDataPath();
+        var toolsScrcpyDir = Path.Combine(appDataPath, "tools", "scrcpy");
+        candidates.Add(Path.Combine(toolsScrcpyDir, executableName));
+        // scrcpy zip often has a version-named subfolder
+        if (Directory.Exists(toolsScrcpyDir))
+        {
+            try
+            {
+                foreach (var subDir in Directory.GetDirectories(toolsScrcpyDir))
+                {
+                    candidates.Add(Path.Combine(subDir, executableName));
+                }
+            }
+            catch { }
+        }
+
         var baseDir = AppContext.BaseDirectory;
 
-        // 2. Check bundled locations (relative to application)
+        // 3. Check bundled locations (relative to application)
         candidates.Add(Path.Combine(baseDir, "scrcpy", executableName));
         candidates.Add(Path.Combine(baseDir, executableName));
 
-        // 3. Check application data directory (extracted resources location)
-        var appDataPath = _platformService.GetAppDataPath();
+        // 4. Check application data directory (extracted resources location)
         candidates.Add(Path.Combine(appDataPath, "scrcpy", executableName));
 
         // 4. Check parent directories (for development scenarios like bin\Debug\net8.0)
@@ -308,6 +324,13 @@ public sealed class ScrcpyService : IScrcpyService
         }
 
         return null;
+    }
+
+    /// <inheritdoc />
+    public void InvalidatePathCache()
+    {
+        _pathResolved = false;
+        _scrcpyPath = null;
     }
 
     /// <summary>

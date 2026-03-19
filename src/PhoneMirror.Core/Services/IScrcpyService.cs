@@ -49,4 +49,10 @@ public interface IScrcpyService
     /// The event argument contains a status message with exit details.
     /// </summary>
     event EventHandler<string>? MirroringStopped;
+
+    /// <summary>
+    /// Invalidates the cached path so the next operation re-resolves the scrcpy location.
+    /// Call after downloading or installing scrcpy.
+    /// </summary>
+    void InvalidatePathCache();
 }

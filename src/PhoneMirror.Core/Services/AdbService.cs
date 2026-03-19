@@ -272,7 +272,13 @@ public sealed class AdbService : IAdbService
             candidates.Add(extractedPath);
         }
 
-        // 2. Bundled locations relative to the app
+        // 2. AppData tools directory (auto-downloaded by DependencyManager)
+        var appDataPath = _platformService.GetAppDataPath();
+        var toolsDir = Path.Combine(appDataPath, "tools", "platform-tools");
+        candidates.Add(Path.Combine(toolsDir, adbExecutable));
+        candidates.Add(Path.Combine(toolsDir, "platform-tools", adbExecutable));
+
+        // 3. Bundled locations relative to the app
         var baseDir = AppContext.BaseDirectory;
         candidates.Add(Path.Combine(baseDir, "platform-tools", adbExecutable));
         candidates.Add(Path.Combine(baseDir, adbExecutable));
@@ -348,5 +354,12 @@ public sealed class AdbService : IAdbService
 
         // Fallback to bare command name - let the process runner fail clearly if not found
         return "adb";
+    }
+
+    /// <inheritdoc />
+    public void InvalidatePathCache()
+    {
+        _pathResolved = false;
+        _resolvedAdbPath = null;
     }
 }

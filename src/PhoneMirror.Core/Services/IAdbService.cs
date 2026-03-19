@@ -48,4 +48,10 @@ public interface IAdbService
         TimeSpan interval,
         Action<DeviceState, AndroidDevice?> observer,
         CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Invalidates the cached path so the next operation re-resolves the ADB location.
+    /// Call after downloading or installing ADB.
+    /// </summary>
+    void InvalidatePathCache();
 }

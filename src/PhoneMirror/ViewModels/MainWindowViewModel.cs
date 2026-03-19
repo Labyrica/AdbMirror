@@ -31,6 +31,7 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     private readonly IScreenshotService _screenshotService;
     private readonly ILogcatService _logcatService;
     private readonly ISettingsService _settings;
+    private readonly IDependencyManager _dependencyManager;
     private readonly CancellationTokenSource _pollCts = new();
     private FloatingToolbar? _floatingToolbar;
     private DispatcherTimer? _logPollTimer;
@@ -206,15 +207,41 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     /// </summary>
     public string LogEntryCountText => LogEntries.Count > 0 ? $"({LogEntries.Count})" : "";
 
+    // ========== Setup/Download Progress Properties ==========
+
+    /// <summary>
+    /// Whether the setup overlay is visible (downloading dependencies).
+    /// </summary>
+    [ObservableProperty]
+    private bool _isSetupVisible;
+
+    /// <summary>
+    /// Setup progress text (e.g., "Downloading ADB... 45MB / 60MB").
+    /// </summary>
+    [ObservableProperty]
+    private string _setupStatusText = "";
+
+    /// <summary>
+    /// Setup progress percentage (0-100).
+    /// </summary>
+    [ObservableProperty]
+    private double _setupProgress;
+
+    /// <summary>
+    /// Whether setup encountered an error.
+    /// </summary>
+    [ObservableProperty]
+    private bool _setupHasError;
+
     /// <summary>
     /// Gets the ADB path for display in settings.
     /// </summary>
-    public string AdbPath => _adbService.AdbPath ?? "Not found";
+    public string AdbPath => _adbService.AdbPath ?? _dependencyManager.GetAdbPath() ?? "Not found";
 
     /// <summary>
     /// Gets the scrcpy path for display in settings.
     /// </summary>
-    public string ScrcpyPath => _scrcpyService.ScrcpyPath ?? "Not found";
+    public string ScrcpyPath => _scrcpyService.ScrcpyPath ?? _dependencyManager.GetScrcpyPath() ?? "Not found";
 
     /// <summary>
     /// Initializes a new instance of the MainWindowViewModel.
@@ -229,13 +256,15 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         IScrcpyService scrcpyService,
         IScreenshotService screenshotService,
         ILogcatService logcatService,
-        ISettingsService settingsService)
+        ISettingsService settingsService,
+        IDependencyManager dependencyManager)
     {
         _adbService = adbService ?? throw new ArgumentNullException(nameof(adbService));
         _scrcpyService = scrcpyService ?? throw new ArgumentNullException(nameof(scrcpyService));
         _screenshotService = screenshotService ?? throw new ArgumentNullException(nameof(screenshotService));
         _logcatService = logcatService ?? throw new ArgumentNullException(nameof(logcatService));
         _settings = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
+        _dependencyManager = dependencyManager ?? throw new ArgumentNullException(nameof(dependencyManager));
 
         // Initialize all properties from persisted settings
         _selectedPreset = _settings.DefaultPreset;
@@ -251,13 +280,20 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     }
 
     /// <summary>
-    /// Initializes the ViewModel by checking ADB availability and starting device polling.
+    /// Initializes the ViewModel by ensuring dependencies, checking ADB availability, and starting device polling.
     /// </summary>
     private async Task InitializeAsync()
     {
         try
         {
-            // Check if ADB is available
+            // Check if dependencies are available, download if missing
+            var depsAvailable = await _dependencyManager.AreDependenciesAvailableAsync();
+            if (!depsAvailable)
+            {
+                await DownloadDependenciesAsync();
+            }
+
+            // Check if ADB is available (may have been downloaded or on PATH)
             var isAvailable = await _adbService.IsAvailableAsync();
             if (!isAvailable)
             {
@@ -267,6 +303,10 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
 
             // Set ADB path
             AdbPathText = _adbService.AdbPath ?? "Unknown";
+
+            // Notify path properties changed (may have been resolved during setup)
+            OnPropertyChanged(nameof(AdbPath));
+            OnPropertyChanged(nameof(ScrcpyPath));
 
             // Start polling for device state changes
             await _adbService.StartPollingAsync(
@@ -281,6 +321,72 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
         catch (Exception ex)
         {
             StatusText = $"Error: {ex.Message}";
+        }
+    }
+
+    /// <summary>
+    /// Downloads missing dependencies with progress reporting.
+    /// </summary>
+    private async Task DownloadDependenciesAsync()
+    {
+        IsSetupVisible = true;
+        SetupHasError = false;
+        SetupStatusText = "Checking dependencies...";
+        SetupProgress = 0;
+
+        var progress = new Progress<DependencyProgress>(p =>
+        {
+            Dispatcher.UIThread.Post(() =>
+            {
+                SetupStatusText = p.Status;
+                SetupProgress = p.PercentComplete;
+                SetupHasError = p.HasError;
+
+                if (p.IsComplete)
+                {
+                    IsSetupVisible = false;
+                    if (p.HasError)
+                    {
+                        StatusText = p.ErrorMessage ?? "Setup failed";
+                    }
+                    else
+                    {
+                        StatusText = "Ready";
+                        // Force path re-resolution after download
+                        OnPropertyChanged(nameof(AdbPath));
+                        OnPropertyChanged(nameof(ScrcpyPath));
+                    }
+                }
+            });
+        });
+
+        try
+        {
+            await _dependencyManager.EnsureDependenciesAsync(progress, _pollCts.Token);
+
+            // Invalidate cached paths so services re-resolve after download
+            _adbService.InvalidatePathCache();
+            _scrcpyService.InvalidatePathCache();
+        }
+        catch (Exception ex)
+        {
+            IsSetupVisible = false;
+            StatusText = $"Setup failed: {ex.Message}";
+        }
+    }
+
+    /// <summary>
+    /// Retries dependency download after a failure.
+    /// </summary>
+    [RelayCommand]
+    private async Task RetrySetupAsync()
+    {
+        await DownloadDependenciesAsync();
+
+        // If successful, continue initialization
+        if (!SetupHasError)
+        {
+            _ = InitializeAsync();
         }
     }
 

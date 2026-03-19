@@ -71,6 +71,9 @@ public partial class App : Application
         // Register resource extractor
         services.AddSingleton<IResourceExtractor, ResourceExtractor>();
 
+        // Register dependency manager (auto-downloads ADB and scrcpy)
+        services.AddSingleton<IDependencyManager, DependencyManager>();
+
         // Register settings service
         services.AddSingleton<ISettingsService, SettingsService>();
 
