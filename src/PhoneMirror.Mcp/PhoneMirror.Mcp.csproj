@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>adb-bridge</AssemblyName>
+    <RootNamespace>PhoneMirror.Mcp</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Version>1.0.0</Version>
+    <Authors>Labyrica</Authors>
+    <Product>ADB Bridge MCP Server</Product>
+    <Description>MCP server exposing ADB device tools for Claude Code</Description>
+  </PropertyGroup>
+
+  <!-- Publishing configuration (specify RID at publish time: dotnet publish -r win-x64 / osx-arm64 / linux-x64) -->
+  <PropertyGroup Condition="'$(PublishSingleFile)' == 'true'">
+    <SelfContained>true</SelfContained>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PhoneMirror.Core\PhoneMirror.Core.csproj" />
+  </ItemGroup>
+
+</Project>

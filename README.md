@@ -1,155 +1,197 @@
 # AdbMirror
 
-**Phone Mirror** — A tactical Windows desktop application for live Android device mirroring via ADB and scrcpy.
+**Phone Mirror** — Android screen mirroring + an MCP server that gives Claude Code direct access to your Android device.
 
 ## Overview
 
-AdbMirror provides a streamlined interface to mirror your Android phone's screen to your Windows PC in real-time. Built with a dark, high-contrast UI following the Labyrica design language, it offers a focused experience for developers, testers, and power users who need reliable device mirroring.
+AdbMirror is a desktop app that mirrors your Android phone's screen to your PC in real-time, **and** exposes an MCP (Model Context Protocol) server so Claude Code can see your screen, tap UI elements, read crash logs, and run ADB commands — all as native tools.
+
+Built with Avalonia UI following the Labyrica design language. Works on **Windows**, **macOS**, and **Linux**.
+
+## What's New in v2.0
+
+### ADB Bridge MCP Server
+
+Claude Code can now interact directly with your Android device through 18 native tools:
+
+| Tool | What it does |
+|------|-------------|
+| `screenshot` | Capture the device screen as a PNG image |
+| `crash_log` | Get FATAL EXCEPTION / ANR / native crash traces |
+| `app_logs` | Filtered logcat by package, level, time window, regex |
+| `tap` | Tap UI elements by text, content-desc, resource-id, or coordinates |
+| `swipe` | Swipe gestures by coordinates or direction |
+| `input_text` | Type text into the focused field |
+| `press_key` | Press back, home, enter, volume, power, etc. |
+| `ui_tree` | Get the current UI element hierarchy |
+| `app_status` | Check if app is running, foreground/background, memory, PID |
+| `device_info` | Model, Android version, screen size, battery, storage |
+| `list_packages` | List installed apps |
+| `install_apk` | Install an APK with auto-grant permissions |
+| `launch_app` | Launch an app by package name |
+| `force_stop` | Force stop an app |
+| `shell` | Run any ADB shell command |
+| `pixel_color` | Sample pixel RGB/hex/luminance at coordinates |
+| `performance_snapshot` | FPS, janky frames, memory breakdown |
+| `screen_record` | Record screen to MP4 (max 180s) |
+
+### One-Click Setup
+
+Click the copy button in the app header to copy the Claude Code MCP configuration to your clipboard — paste it into your `~/.claude/settings.json` and you're ready to go.
+
+### Cross-Platform
+
+The MCP server runs on Windows, macOS (Intel + Apple Silicon), and Linux.
+
+---
 
 ## Features
 
-- **Live Screen Mirroring**: Real-time Android device screen mirroring using scrcpy
-- **Automatic Device Detection**: Continuously monitors for connected Android devices via ADB
-- **Quality Presets**: Choose from Low, Balanced, or High quality presets for optimal performance
-- **Auto-Mirror**: Optionally start mirroring automatically when a device connects
-- **Device Status Monitoring**: Real-time status updates showing device connection state
-- **Event Logging**: Detailed event log with timestamps for troubleshooting
-- **Settings Persistence**: Saves your preferences (default preset, auto-mirror, fullscreen options)
+### Screen Mirroring
+- **Live Screen Mirroring** via scrcpy
+- **Automatic Device Detection** with continuous ADB polling
+- **Quality Presets**: Low, Balanced, High
+- **Auto-Mirror**: Start mirroring automatically when a device connects
+- **Screenshot to Clipboard**: Capture and copy device screenshots instantly
+- **Error Monitoring**: Real-time logcat error capture during mirroring
+
+### MCP Server for Claude Code
+- **18 ADB tools** exposed as native Claude Code tools
+- **No Bash wrappers** — tools appear alongside Read, Write, Grep
+- **Auto-detect device** — most tools work without specifying a serial
+- **Smart element finding** — `tap` parses the UI hierarchy to find elements by text
+- **JSON-RPC over stdio** — follows the MCP specification
 
 ## Requirements
 
-- **Windows** (targets .NET 8.0 Windows)
-- **.NET SDK 8.0** or compatible runtime
-- **ADB (Android Debug Bridge)**: Either bundled with the app or available on PATH
-- **scrcpy**: Either bundled with the app or available on PATH
-- **Android Device**: USB debugging enabled and authorized
+- **.NET 8 SDK** (`dotnet --version` to check)
+- **ADB** in PATH, or `ANDROID_HOME` / `ANDROID_SDK_ROOT` set
+- **scrcpy** (for mirroring only — MCP server doesn't need it)
+- **Android device** with USB debugging enabled
 
 ## Installation
 
-1. Clone or download this repository
-2. Ensure you have the .NET SDK 8.0 installed
-3. Build the application (see [BUILD.md](BUILD.md) for instructions)
+### From Release (recommended)
+
+Download the latest release for your platform from [Releases](../../releases):
+
+- **Windows**: `adb-bridge-win-x64.exe` + `PhoneMirror-win-x64.exe`
+- **macOS Intel**: `adb-bridge-osx-x64`
+- **macOS Apple Silicon**: `adb-bridge-osx-arm64`
+- **Linux**: `adb-bridge-linux-x64`
+
+### From Source
+
+```bash
+git clone https://github.com/user/AdbMirror.git
+cd AdbMirror
+dotnet build
+```
 
 ## Quick Start
 
-1. **Connect your Android device** via USB with USB debugging enabled
-2. **Authorize the computer** when prompted on your phone
-3. **Launch AdbMirror**
-4. Select your desired **Quality Preset** (Low/Balanced/High)
-5. Click **Mirror** to start screen mirroring
-6. Click **Stop** to end the mirroring session
+### Screen Mirroring
 
-## Usage
+1. Connect your Android device via USB with USB debugging enabled
+2. Authorize the computer when prompted on your phone
+3. Launch PhoneMirror
+4. Select quality preset and click **Mirror**
 
-### Main Interface
+### Claude Code Integration
 
-- **Left Panel**: Shows device status, ADB path information, and event logs
-- **Right Panel**: Device controls, mirror button, quality preset selector, and settings
+**Option A**: Click the copy button in the PhoneMirror app header, paste into `~/.claude/settings.json`
 
-### Quality Presets
+**Option B**: Add manually to `~/.claude/settings.json`:
 
-- **Low**: Lower resolution/bitrate for better performance on slower connections
-- **Balanced**: Default preset with good balance of quality and performance
-- **High**: Higher resolution/bitrate for best visual quality
+```jsonc
+{
+  "mcpServers": {
+    "adb-bridge": {
+      "command": "dotnet",
+      "args": ["run", "--project", "/path/to/src/PhoneMirror.Mcp/PhoneMirror.Mcp.csproj"]
+    }
+  }
+}
+```
 
-### Settings
+**Option C**: Use the published binary:
 
-Access advanced settings via the gear icon next to the quality preset:
+```jsonc
+{
+  "mcpServers": {
+    "adb-bridge": {
+      "command": "C:/path/to/adb-bridge.exe"
+    }
+  }
+}
+```
 
-- **Auto mirror when device connects**: Automatically start mirroring when a device is detected
-- **Start scrcpy in fullscreen**: Launch the mirror window in fullscreen mode
-- **Default quality preset**: Set your preferred preset as the default
-
-### Event Log
-
-The event log shows:
-- Device connection/disconnection events
-- ADB and scrcpy status messages
-- Error messages and troubleshooting information
-- Use the copy button (document icon) to copy logs to clipboard
+Then in Claude Code, the tools appear natively. Claude can:
+- Take screenshots and analyze them
+- Tap buttons by their text label
+- Read crash logs and fix bugs
+- Run automated QA sequences
+- Check performance metrics
 
 ## Building
 
-See [BUILD.md](BUILD.md) for detailed build instructions.
+### Mirror App (Windows)
 
-Quick build commands:
-
-**PowerShell:**
 ```powershell
-cd AdbMirror
-dotnet build
-dotnet run
+dotnet build src/PhoneMirror/PhoneMirror.csproj
+dotnet run --project src/PhoneMirror/PhoneMirror.csproj
 ```
 
-**CMD:**
-```cmd
-cd AdbMirror
-dotnet build
-dotnet run
+### MCP Server (cross-platform)
+
+```bash
+# Development
+dotnet run --project src/PhoneMirror.Mcp/PhoneMirror.Mcp.csproj
+
+# Publish for your platform
+dotnet publish src/PhoneMirror.Mcp/PhoneMirror.Mcp.csproj -c Release -r win-x64 -p:PublishSingleFile=true
+dotnet publish src/PhoneMirror.Mcp/PhoneMirror.Mcp.csproj -c Release -r osx-arm64 -p:PublishSingleFile=true
+dotnet publish src/PhoneMirror.Mcp/PhoneMirror.Mcp.csproj -c Release -r linux-x64 -p:PublishSingleFile=true
 ```
-
-Or use the provided scripts:
-- `build_and_run.cmd` (Windows CMD)
-- `build_and_run.ps1` (PowerShell)
-
-## Distribution / Publishing
-
-To create a **single-file executable with ALL dependencies embedded**:
-
-**PowerShell:**
-```powershell
-.\publish_single_file.ps1
-```
-
-**CMD:**
-```cmd
-publish_single_file.cmd
-```
-
-This creates a self-contained `AdbMirror.exe` in `AdbMirror\bin\Release\net8.0-windows\win-x64\publish\`.
-
-**Important**: The executable is a **true single-file** - all dependencies (platform-tools and scrcpy) are embedded inside the exe and extracted automatically at runtime to a temporary directory. You only need to distribute the single `AdbMirror.exe` file!
-
-The publish script automatically:
-1. Zips the `platform-tools` and `scrcpy` folders
-2. Embeds them as resources in the executable
-3. Creates a single-file exe that extracts them on first run
 
 ## Architecture
 
-- **AdbService**: Handles ADB operations, device discovery, and state polling
-- **ScrcpyService**: Manages scrcpy process lifecycle and quality presets
-- **MainViewModel**: UI state management and business logic
-- **AppSettings**: Persistent settings storage (JSON)
-
-## Dependencies
-
-- **scrcpy**: Screen mirroring engine (bundled or system-installed)
-- **ADB**: Android Debug Bridge (bundled or system-installed)
-- **.NET 8.0 Windows**: WPF framework for the desktop UI
+```
+PhoneMirror.sln
+├── src/PhoneMirror/          # Avalonia desktop UI app
+│   ├── Views/                # XAML views
+│   ├── ViewModels/           # MVVM view models
+│   └── Services/             # UI services (clipboard, MCP setup generator)
+├── src/PhoneMirror.Core/     # Shared core library
+│   ├── Services/             # ADB, scrcpy, screenshot, logcat, settings
+│   ├── Models/               # Data models
+│   ├── Execution/            # Process runner
+│   └── Platform/             # Cross-platform abstractions
+└── src/PhoneMirror.Mcp/      # MCP server (Claude Code integration)
+    ├── McpServer.cs          # JSON-RPC protocol handler
+    ├── AdbToolHandler.cs     # 18 tool implementations
+    └── McpTypes.cs           # Protocol DTOs
+```
 
 ## Troubleshooting
 
-### "ADB not found"
-- Ensure ADB is bundled in `platform-tools/` directory, or
-- Install Android SDK platform-tools and add to PATH, or
-- Set ANDROID_HOME/ANDROID_SDK_ROOT environment variables
-
-### "scrcpy not found"
-- Ensure scrcpy is bundled in `scrcpy/` directory, or
-- Install scrcpy and add to PATH
+### MCP server: "ADB not available"
+- Ensure ADB is in your PATH or set `ANDROID_HOME`
+- The MCP server logs to stderr — check Claude Code's MCP output panel
 
 ### Device not detected
 - Enable USB debugging on your Android device
 - Authorize the computer when prompted
-- Check USB cable connection
-- Try different USB port or cable
+- Check `adb devices` in a terminal
 
-### Mirroring fails to start
-- Check event log for specific error messages
-- Ensure device is in "Connected" state (not "Unauthorized" or "Offline")
-- Verify scrcpy is available and working
-- Try a different quality preset
+### `tap` tool can't find elements
+- Use `ui_tree` first to see what's on screen
+- Element text matching is case-insensitive and uses "contains"
+- Some elements may not have text — use `content_desc` or `resource_id` instead
+
+### macOS: permission errors
+- Grant Terminal / IDE access in System Preferences > Privacy > Developer Tools
+- Run `xattr -d com.apple.quarantine ./adb-bridge` if macOS blocks the binary
 
 ## License
 
@@ -158,4 +200,3 @@ See LICENSE file for details.
 ## Credits
 
 Built by [Labyrica](https://labyrica.com) — Data driven solutions.
-

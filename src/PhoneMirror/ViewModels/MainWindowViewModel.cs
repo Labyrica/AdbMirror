@@ -17,6 +17,7 @@ using PhoneMirror.Core.Models;
 using PhoneMirror.Core.Services;
 using PhoneMirror.Services;
 using PhoneMirror.Views;
+using System.Runtime.InteropServices;
 
 namespace PhoneMirror.ViewModels;
 
@@ -491,6 +492,37 @@ public partial class MainWindowViewModel : ViewModelBase, IDisposable
     {
         _floatingToolbar?.Close();
         _floatingToolbar = null;
+    }
+
+    // ========== MCP Setup Command ==========
+
+    /// <summary>
+    /// Status text shown after copying MCP setup (e.g., "Copied!" or "").
+    /// </summary>
+    [ObservableProperty]
+    private string _mcpCopyStatus = "";
+
+    /// <summary>
+    /// Copies the MCP server setup guide to the clipboard.
+    /// Includes auto-detected paths for the current platform.
+    /// </summary>
+    [RelayCommand]
+    private async Task CopyMcpSetupAsync()
+    {
+        var clipboard = GetClipboard();
+        if (clipboard == null)
+        {
+            StatusText = "Clipboard not available";
+            return;
+        }
+
+        var guide = McpSetupGenerator.Generate();
+        await clipboard.SetTextAsync(guide);
+        McpCopyStatus = "Copied!";
+
+        // Reset the status after 2 seconds
+        _ = Task.Delay(2000).ContinueWith(_ =>
+            Dispatcher.UIThread.Post(() => McpCopyStatus = ""));
     }
 
     // ========== Panel Toggle Commands ==========
