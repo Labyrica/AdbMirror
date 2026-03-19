@@ -852,7 +852,6 @@ public sealed class AdbToolHandler
 
         int tapX, tapY;
         string? elementInfo = null;
-        var wasTransformed = false;
 
         if (x.HasValue && y.HasValue)
         {
@@ -864,7 +863,6 @@ public sealed class AdbToolHandler
                 var (inputX, inputY) = VisualToInput(x.Value, y.Value, rotation, physW, physH);
                 tapX = inputX;
                 tapY = inputY;
-                wasTransformed = true;
                 elementInfo = $"Visual coords ({x.Value},{y.Value}) → Device coords ({tapX},{tapY}) [rotation={rotation}]";
             }
             else
