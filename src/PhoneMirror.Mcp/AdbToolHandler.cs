@@ -42,7 +42,7 @@ public sealed class AdbToolHandler
         return new List<ToolDefinition>
         {
             MakeTool("screenshot",
-                "Capture the Android device screen and return as a PNG image.",
+                "Capture the Android device screen and return as a PNG image. Includes rotation and coordinate system metadata so you know how to interpret coordinates.",
                 """
                 {
                     "type": "object",
@@ -53,13 +53,13 @@ public sealed class AdbToolHandler
                 """),
 
             MakeTool("crash_log",
-                "Get the last crash traces (FATAL EXCEPTION, ANR, native crashes) for an app.",
+                "Get crash traces from multiple sources: logcat crash buffer, dropbox crash reports, tombstones, and ANR traces. Much more comprehensive than basic logcat.",
                 """
                 {
                     "type": "object",
                     "properties": {
                         "package": { "type": "string", "description": "App package name. Omit to get all crashes." },
-                        "last_n": { "type": "integer", "description": "Number of recent crashes to return. Default: 3", "default": 3 }
+                        "last_n": { "type": "integer", "description": "Number of recent crashes to return. Default: 5", "default": 5 }
                     }
                 }
                 """),
@@ -80,7 +80,7 @@ public sealed class AdbToolHandler
                 """),
 
             MakeTool("tap",
-                "Tap a UI element by its text, content description, resource ID, or exact coordinates. Finds the element in the UI hierarchy and taps its center.",
+                "Tap a UI element by its text, content description, resource ID, or visual coordinates. When using x/y coordinates, these are automatically translated from screenshot (visual) coordinates to device input coordinates, accounting for screen rotation. Prefer using text/content_desc/resource_id for reliability.",
                 """
                 {
                     "type": "object",
@@ -88,8 +88,8 @@ public sealed class AdbToolHandler
                         "text": { "type": "string", "description": "Find and tap element containing this text." },
                         "content_desc": { "type": "string", "description": "Find by accessibility content description." },
                         "resource_id": { "type": "string", "description": "Find by resource ID (e.g. 'com.app:id/button')." },
-                        "x": { "type": "integer", "description": "Tap at exact X coordinate." },
-                        "y": { "type": "integer", "description": "Tap at exact Y coordinate." },
+                        "x": { "type": "integer", "description": "Tap at visual X coordinate (as seen in screenshot). Auto-rotated to device coords." },
+                        "y": { "type": "integer", "description": "Tap at visual Y coordinate (as seen in screenshot). Auto-rotated to device coords." },
                         "index": { "type": "integer", "description": "Which match to tap if multiple found (0-based). Default: 0", "default": 0 },
                         "long_press": { "type": "boolean", "description": "Long press instead of tap. Default: false", "default": false },
                         "double_tap": { "type": "boolean", "description": "Double tap. Default: false", "default": false }
@@ -98,15 +98,15 @@ public sealed class AdbToolHandler
                 """),
 
             MakeTool("swipe",
-                "Perform a swipe gesture on the device screen.",
+                "Perform a swipe gesture on the device screen. When using coordinates, they are automatically translated from screenshot (visual) coordinates to device input coordinates.",
                 """
                 {
                     "type": "object",
                     "properties": {
-                        "start_x": { "type": "integer", "description": "Start X coordinate." },
-                        "start_y": { "type": "integer", "description": "Start Y coordinate." },
-                        "end_x": { "type": "integer", "description": "End X coordinate." },
-                        "end_y": { "type": "integer", "description": "End Y coordinate." },
+                        "start_x": { "type": "integer", "description": "Start X visual coordinate." },
+                        "start_y": { "type": "integer", "description": "Start Y visual coordinate." },
+                        "end_x": { "type": "integer", "description": "End X visual coordinate." },
+                        "end_y": { "type": "integer", "description": "End Y visual coordinate." },
                         "duration_ms": { "type": "integer", "description": "Swipe duration in milliseconds. Default: 300", "default": 300 },
                         "direction": { "type": "string", "enum": ["up", "down", "left", "right"], "description": "Swipe direction from screen center. Use instead of coordinates." }
                     },
@@ -114,13 +114,29 @@ public sealed class AdbToolHandler
                 }
                 """),
 
-            MakeTool("input_text",
-                "Type text on the device. The focused text field will receive the input.",
+            MakeTool("pinch",
+                "Perform a pinch (zoom in/out) gesture on the device screen. Uses two concurrent touch points.",
                 """
                 {
                     "type": "object",
                     "properties": {
-                        "text": { "type": "string", "description": "Text to type." }
+                        "center_x": { "type": "integer", "description": "Center X coordinate of the pinch gesture. Default: screen center." },
+                        "center_y": { "type": "integer", "description": "Center Y coordinate of the pinch gesture. Default: screen center." },
+                        "action": { "type": "string", "enum": ["zoom_in", "zoom_out"], "description": "Pinch direction: zoom_in (spread fingers apart) or zoom_out (pinch fingers together). Default: zoom_in", "default": "zoom_in" },
+                        "scale": { "type": "number", "description": "Scale factor: how far fingers move relative to screen size (0.1-0.5). Default: 0.25", "default": 0.25 },
+                        "duration_ms": { "type": "integer", "description": "Gesture duration in milliseconds. Default: 500", "default": 500 }
+                    }
+                }
+                """),
+
+            MakeTool("input_text",
+                "Type text on the device. Tries standard input first, falls back to clipboard paste for Flutter/React Native/WebView text fields. Use 'use_clipboard: true' to force clipboard mode.",
+                """
+                {
+                    "type": "object",
+                    "properties": {
+                        "text": { "type": "string", "description": "Text to type." },
+                        "use_clipboard": { "type": "boolean", "description": "Force clipboard paste mode (works with Flutter/RN/WebView). Default: false", "default": false }
                     },
                     "required": ["text"]
                 }
@@ -139,7 +155,7 @@ public sealed class AdbToolHandler
                 """),
 
             MakeTool("ui_tree",
-                "Get the current UI element hierarchy from the device screen.",
+                "Get the current UI element hierarchy from the device screen. Bounds are in the device's native coordinate system. Includes rotation metadata.",
                 """
                 {
                     "type": "object",
@@ -163,7 +179,7 @@ public sealed class AdbToolHandler
                 """),
 
             MakeTool("device_info",
-                "Get device details: model, Android version, screen size, battery, storage.",
+                "Get device details: model, Android version, screen size, rotation, battery, storage.",
                 """
                 {
                     "type": "object",
@@ -233,20 +249,20 @@ public sealed class AdbToolHandler
                 """),
 
             MakeTool("pixel_color",
-                "Sample the color of a pixel at given coordinates from a fresh screenshot.",
+                "Sample the color of a pixel at given coordinates from a fresh screenshot. Coordinates are visual (as seen in the screenshot image), auto-translated for rotation.",
                 """
                 {
                     "type": "object",
                     "properties": {
-                        "x": { "type": "integer", "description": "X coordinate." },
-                        "y": { "type": "integer", "description": "Y coordinate." }
+                        "x": { "type": "integer", "description": "Visual X coordinate (as seen in screenshot)." },
+                        "y": { "type": "integer", "description": "Visual Y coordinate (as seen in screenshot)." }
                     },
                     "required": ["x", "y"]
                 }
                 """),
 
             MakeTool("performance_snapshot",
-                "Capture app performance metrics: FPS, janky frames, memory usage.",
+                "Capture app performance metrics: frame rendering stats, memory usage, CPU usage, and GPU rendering info.",
                 """
                 {
                     "type": "object",
@@ -285,6 +301,7 @@ public sealed class AdbToolHandler
                 "app_logs" => await AppLogsAsync(arguments, ct),
                 "tap" => await TapAsync(arguments, ct),
                 "swipe" => await SwipeAsync(arguments, ct),
+                "pinch" => await PinchAsync(arguments, ct),
                 "input_text" => await InputTextAsync(arguments, ct),
                 "press_key" => await PressKeyAsync(arguments, ct),
                 "ui_tree" => await UiTreeAsync(arguments, ct),
@@ -406,6 +423,91 @@ public sealed class AdbToolHandler
         return match.Success ? match.Groups[1].Value : null;
     }
 
+    // ─── Rotation & Coordinate Helpers ───
+
+    /// <summary>
+    /// Gets the current display rotation (0=portrait, 1=landscape CCW, 2=inverted, 3=landscape CW).
+    /// </summary>
+    private async Task<int> GetRotationAsync(string serial, CancellationToken ct)
+    {
+        var result = await RunAdbShellAsync(serial, "dumpsys input | grep SurfaceOrientation", ct);
+        if (result.Success)
+        {
+            var match = Regex.Match(result.StandardOutput, @"SurfaceOrientation:\s*(\d)");
+            if (match.Success)
+                return int.Parse(match.Groups[1].Value);
+        }
+        // Fallback
+        var result2 = await RunAdbShellAsync(serial, "dumpsys display | grep mCurrentOrientation", ct);
+        if (result2.Success)
+        {
+            var match = Regex.Match(result2.StandardOutput, @"mCurrentOrientation=(\d)");
+            if (match.Success)
+                return int.Parse(match.Groups[1].Value);
+        }
+        return 0;
+    }
+
+    /// <summary>
+    /// Gets the physical (portrait) screen dimensions.
+    /// </summary>
+    private async Task<(int Width, int Height)> GetPhysicalSizeAsync(string serial, CancellationToken ct)
+    {
+        var result = await RunAdbShellAsync(serial, "wm size", ct);
+        if (result.Success)
+        {
+            var match = Regex.Match(result.StandardOutput, @"(\d+)x(\d+)");
+            if (match.Success)
+            {
+                var w = int.Parse(match.Groups[1].Value);
+                var h = int.Parse(match.Groups[2].Value);
+                // wm size always returns portrait dimensions (shorter x longer)
+                return (Math.Min(w, h), Math.Max(w, h));
+            }
+        }
+        return (1080, 1920);
+    }
+
+    /// <summary>
+    /// Transforms visual (screenshot) coordinates to device input coordinates based on rotation.
+    /// </summary>
+    private static (int X, int Y) VisualToInput(int vx, int vy, int rotation, int physW, int physH)
+    {
+        return rotation switch
+        {
+            // Portrait: no transform
+            0 => (vx, vy),
+            // Landscape 90° CCW: visual is (physH x physW), input is portrait
+            1 => (physW - vy, vx),
+            // Inverted portrait: visual is (physW x physH)
+            2 => (physW - vx, physH - vy),
+            // Landscape 90° CW: visual is (physH x physW), input is portrait
+            3 => (vy, physH - vx),
+            _ => (vx, vy)
+        };
+    }
+
+    /// <summary>
+    /// Gets the visual (screenshot) screen dimensions based on rotation.
+    /// </summary>
+    private static (int Width, int Height) GetVisualSize(int physW, int physH, int rotation)
+    {
+        return rotation switch
+        {
+            1 or 3 => (physH, physW), // Landscape: swap dimensions
+            _ => (physW, physH)       // Portrait or inverted
+        };
+    }
+
+    private string RotationLabel(int rotation) => rotation switch
+    {
+        0 => "portrait",
+        1 => "landscape (90° CCW)",
+        2 => "portrait (inverted)",
+        3 => "landscape (90° CW)",
+        _ => $"unknown ({rotation})"
+    };
+
     // ─── Tool Implementations ───
 
     private async Task<ToolCallResult> ScreenshotAsync(JsonElement? args, CancellationToken ct)
@@ -418,10 +520,22 @@ public sealed class AdbToolHandler
         if (pngData == null)
             return ErrorResult($"Screenshot failed: {error}");
 
+        // Get rotation and size metadata
+        var rotation = await GetRotationAsync(serial, ct);
+        var (physW, physH) = await GetPhysicalSizeAsync(serial, ct);
+        var (visW, visH) = GetVisualSize(physW, physH, rotation);
+
+        var metadata = $"Orientation: {RotationLabel(rotation)} | Visual size: {visW}x{visH} | Physical size: {physW}x{physH}";
+        if (rotation != 0)
+        {
+            metadata += "\nNOTE: Device is rotated. When using tap/swipe/pixel_color with x/y coordinates, provide visual coordinates as seen in this screenshot — they will be auto-translated to device input coordinates.";
+        }
+
         return new ToolCallResult
         {
             Content = new List<ContentBlock>
             {
+                new TextContent { Text = metadata },
                 new ImageContent
                 {
                     Data = Convert.ToBase64String(pngData),
@@ -438,91 +552,205 @@ public sealed class AdbToolHandler
             return ErrorResult("No device connected.");
 
         var package = GetString(args, "package");
-        var lastN = GetInt(args, "last_n", 3);
-
-        // Get FATAL EXCEPTIONs from logcat
-        var result = await RunAdbShellAsync(serial,
-            "logcat -d -b crash,main -s AndroidRuntime:E '*:F'", ct, LongCommandTimeout);
-
+        var lastN = GetInt(args, "last_n", 5);
         var output = new StringBuilder();
+        var foundAnything = false;
 
-        if (result.Success && !string.IsNullOrWhiteSpace(result.StandardOutput))
+        // ── Source 1: Logcat crash buffer (dedicated crash buffer) ──
+        var crashBufResult = await RunAdbShellAsync(serial, "logcat -b crash -d", ct, LongCommandTimeout);
+        if (crashBufResult.Success && !string.IsNullOrWhiteSpace(crashBufResult.StandardOutput))
         {
-            var lines = result.StandardOutput.Split('\n');
-            var crashes = new List<string>();
-            var currentCrash = new StringBuilder();
-            var inCrash = false;
-
-            foreach (var line in lines)
+            var crashes = ExtractCrashBlocks(crashBufResult.StandardOutput, package);
+            if (crashes.Count > 0)
             {
-                if (line.Contains("FATAL EXCEPTION") || line.Contains("Fatal signal"))
+                foundAnything = true;
+                output.AppendLine($"=== Crash Buffer ({crashes.Count} crash(es)) ===");
+                foreach (var crash in crashes.TakeLast(lastN))
                 {
-                    if (inCrash && currentCrash.Length > 0)
-                    {
-                        crashes.Add(currentCrash.ToString());
-                        currentCrash.Clear();
-                    }
-                    inCrash = true;
-                }
-
-                if (inCrash)
-                {
-                    currentCrash.AppendLine(line);
+                    output.AppendLine(crash.TrimEnd());
+                    output.AppendLine();
                 }
             }
+        }
 
-            if (currentCrash.Length > 0)
-                crashes.Add(currentCrash.ToString());
-
-            // Filter by package if specified
+        // ── Source 2: Logcat main buffer for FATAL EXCEPTION / Fatal signal ──
+        var mainResult = await RunAdbShellAsync(serial,
+            "logcat -b main -d -e 'FATAL EXCEPTION|Fatal signal|CRASH|died|Process.*has died'", ct, LongCommandTimeout);
+        if (mainResult.Success && !string.IsNullOrWhiteSpace(mainResult.StandardOutput))
+        {
+            var lines = mainResult.StandardOutput.Split('\n')
+                .Where(l => !string.IsNullOrWhiteSpace(l));
             if (!string.IsNullOrEmpty(package))
+                lines = lines.Where(l => l.Contains(package, StringComparison.OrdinalIgnoreCase));
+            var mainCrashes = lines.TakeLast(lastN * 10).ToList();
+            if (mainCrashes.Count > 0)
             {
-                crashes = crashes.Where(c => c.Contains(package)).ToList();
+                foundAnything = true;
+                output.AppendLine($"=== Main Log Crashes ({mainCrashes.Count} line(s)) ===");
+                foreach (var line in mainCrashes.TakeLast(lastN * 5))
+                    output.AppendLine(line);
+                output.AppendLine();
             }
+        }
 
-            // Take last N
-            var recent = crashes.TakeLast(lastN).ToList();
+        // ── Source 3: Dropbox crash reports (system-level crash storage) ──
+        var dropboxResult = await RunAdbShellAsync(serial,
+            "dumpsys dropbox --print -t 3600000", ct, LongCommandTimeout);
+        if (dropboxResult.Success && !string.IsNullOrWhiteSpace(dropboxResult.StandardOutput))
+        {
+            var dropboxLines = dropboxResult.StandardOutput.Split('\n');
+            var relevantBlocks = new List<string>();
+            var currentBlock = new StringBuilder();
+            var inRelevantBlock = false;
 
-            if (recent.Count == 0)
+            foreach (var line in dropboxLines)
             {
-                output.AppendLine("No crashes found.");
-            }
-            else
-            {
-                output.AppendLine($"Found {recent.Count} crash(es):");
-                for (int i = 0; i < recent.Count; i++)
+                if (line.Contains("data_app_crash") || line.Contains("data_app_anr") ||
+                    line.Contains("system_app_crash") || line.Contains("FATAL") ||
+                    line.Contains("system_server_crash"))
                 {
-                    output.AppendLine($"\n--- Crash {i + 1} ---");
-                    output.AppendLine(recent[i].TrimEnd());
+                    if (currentBlock.Length > 0 && inRelevantBlock)
+                        relevantBlocks.Add(currentBlock.ToString());
+                    currentBlock.Clear();
+                    inRelevantBlock = true;
+                }
+
+                if (inRelevantBlock)
+                    currentBlock.AppendLine(line);
+
+                // Limit block size
+                if (currentBlock.Length > 2000)
+                {
+                    currentBlock.AppendLine("... (truncated)");
+                    inRelevantBlock = false;
+                }
+            }
+            if (currentBlock.Length > 0 && inRelevantBlock)
+                relevantBlocks.Add(currentBlock.ToString());
+
+            if (!string.IsNullOrEmpty(package))
+                relevantBlocks = relevantBlocks.Where(b => b.Contains(package, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            if (relevantBlocks.Count > 0)
+            {
+                foundAnything = true;
+                output.AppendLine($"=== Dropbox Reports ({relevantBlocks.Count}) ===");
+                foreach (var block in relevantBlocks.TakeLast(lastN))
+                {
+                    output.AppendLine(block.TrimEnd());
+                    output.AppendLine();
                 }
             }
         }
-        else
-        {
-            output.AppendLine("No crash logs available (logcat may be empty).");
-        }
 
-        // Also check for ANR traces
-        var anrResult = await RunAdbShellAsync(serial,
-            "logcat -d -b events -s am_anr", ct);
+        // ── Source 4: ANR traces ──
+        var anrResult = await RunAdbShellAsync(serial, "logcat -b events -d | grep -i anr", ct);
         if (anrResult.Success && !string.IsNullOrWhiteSpace(anrResult.StandardOutput))
         {
             var anrLines = anrResult.StandardOutput.Split('\n')
-                .Where(l => !string.IsNullOrWhiteSpace(l))
-                .ToList();
-
+                .Where(l => !string.IsNullOrWhiteSpace(l));
             if (!string.IsNullOrEmpty(package))
-                anrLines = anrLines.Where(l => l.Contains(package)).ToList();
-
-            if (anrLines.Count > 0)
+                anrLines = anrLines.Where(l => l.Contains(package, StringComparison.OrdinalIgnoreCase));
+            var anrList = anrLines.TakeLast(lastN).ToList();
+            if (anrList.Count > 0)
             {
-                output.AppendLine($"\n--- ANR Events ({anrLines.Count}) ---");
-                foreach (var line in anrLines.TakeLast(lastN))
+                foundAnything = true;
+                output.AppendLine($"=== ANR Events ({anrList.Count}) ===");
+                foreach (var line in anrList)
                     output.AppendLine(line);
+                output.AppendLine();
             }
         }
 
+        // ── Source 5: Tombstones (native crashes) ──
+        var tombResult = await RunAdbShellAsync(serial,
+            "ls -lt /data/tombstones/ 2>/dev/null || echo 'no access'", ct);
+        if (tombResult.Success && !tombResult.StandardOutput.Contains("no access") &&
+            !tombResult.StandardOutput.Contains("No such file"))
+        {
+            var tombFiles = tombResult.StandardOutput.Split('\n')
+                .Where(l => l.Contains("tombstone_"))
+                .Take(lastN)
+                .ToList();
+            if (tombFiles.Count > 0)
+            {
+                foundAnything = true;
+                output.AppendLine($"=== Tombstones (native crashes: {tombFiles.Count}) ===");
+                foreach (var tf in tombFiles)
+                    output.AppendLine(tf.Trim());
+
+                // Try to read the most recent tombstone header
+                var latestTomb = await RunAdbShellAsync(serial,
+                    "cat /data/tombstones/tombstone_00 2>/dev/null | head -30", ct);
+                if (latestTomb.Success && !string.IsNullOrWhiteSpace(latestTomb.StandardOutput))
+                {
+                    output.AppendLine("\n--- Latest tombstone (first 30 lines) ---");
+                    output.AppendLine(latestTomb.StandardOutput.TrimEnd());
+                }
+                output.AppendLine();
+            }
+        }
+
+        // ── Source 6: App-specific last crash via ActivityManager ──
+        if (!string.IsNullOrEmpty(package))
+        {
+            var amResult = await RunAdbShellAsync(serial,
+                $"dumpsys activity processes | grep -A 20 '{package}'", ct);
+            if (amResult.Success && amResult.StandardOutput.Contains("crash"))
+            {
+                foundAnything = true;
+                output.AppendLine("=== Activity Manager ===");
+                output.AppendLine(amResult.StandardOutput.TrimEnd());
+                output.AppendLine();
+            }
+        }
+
+        if (!foundAnything)
+        {
+            output.AppendLine("No crashes found across any source.");
+            output.AppendLine("Sources checked: logcat crash buffer, logcat main, dropbox, events/ANR, tombstones" +
+                (string.IsNullOrEmpty(package) ? "" : $", activity manager for {package}"));
+            output.AppendLine("Tip: If the app just crashed, the logcat buffer may have rotated. Try 'app_logs' with level=error for recent errors.");
+        }
+
         return TextResult(output.ToString().TrimEnd());
+    }
+
+    /// <summary>
+    /// Extracts individual crash blocks from logcat output.
+    /// </summary>
+    private static List<string> ExtractCrashBlocks(string logcatOutput, string? packageFilter)
+    {
+        var crashes = new List<string>();
+        var currentCrash = new StringBuilder();
+        var inCrash = false;
+
+        foreach (var line in logcatOutput.Split('\n'))
+        {
+            if (line.Contains("FATAL EXCEPTION") || line.Contains("Fatal signal") ||
+                line.Contains("beginning of crash") || line.Contains("Build fingerprint"))
+            {
+                if (inCrash && currentCrash.Length > 0)
+                {
+                    crashes.Add(currentCrash.ToString());
+                    currentCrash.Clear();
+                }
+                inCrash = true;
+            }
+
+            if (inCrash)
+            {
+                currentCrash.AppendLine(line);
+            }
+        }
+
+        if (currentCrash.Length > 0)
+            crashes.Add(currentCrash.ToString());
+
+        if (!string.IsNullOrEmpty(packageFilter))
+            crashes = crashes.Where(c => c.Contains(packageFilter, StringComparison.OrdinalIgnoreCase)).ToList();
+
+        return crashes;
     }
 
     private async Task<ToolCallResult> AppLogsAsync(JsonElement? args, CancellationToken ct)
@@ -624,15 +852,30 @@ public sealed class AdbToolHandler
 
         int tapX, tapY;
         string? elementInfo = null;
+        var wasTransformed = false;
 
         if (x.HasValue && y.HasValue)
         {
-            tapX = x.Value;
-            tapY = y.Value;
+            // Auto-transform visual coordinates to device input coordinates
+            var rotation = await GetRotationAsync(serial, ct);
+            if (rotation != 0)
+            {
+                var (physW, physH) = await GetPhysicalSizeAsync(serial, ct);
+                var (inputX, inputY) = VisualToInput(x.Value, y.Value, rotation, physW, physH);
+                tapX = inputX;
+                tapY = inputY;
+                wasTransformed = true;
+                elementInfo = $"Visual coords ({x.Value},{y.Value}) → Device coords ({tapX},{tapY}) [rotation={rotation}]";
+            }
+            else
+            {
+                tapX = x.Value;
+                tapY = y.Value;
+            }
         }
         else if (!string.IsNullOrEmpty(text) || !string.IsNullOrEmpty(contentDesc) || !string.IsNullOrEmpty(resourceId))
         {
-            // Dump UI hierarchy and find element
+            // Dump UI hierarchy and find element (bounds are already in device coords)
             var uiXml = await DumpUiHierarchyAsync(serial, ct);
             if (uiXml == null)
                 return ErrorResult("Failed to dump UI hierarchy. The screen may be in a transition state — try again.");
@@ -681,7 +924,7 @@ public sealed class AdbToolHandler
         }
         else if (doubleTap)
         {
-            tapCommand = $"input tap {tapX} {tapY} && input tap {tapX} {tapY}";
+            tapCommand = $"input tap {tapX} {tapY} && sleep 0.05 && input tap {tapX} {tapY}";
         }
         else
         {
@@ -708,26 +951,21 @@ public sealed class AdbToolHandler
 
         var duration = GetInt(args, "duration_ms", 300);
         var direction = GetString(args, "direction");
+        var rotation = await GetRotationAsync(serial, ct);
+        var (physW, physH) = await GetPhysicalSizeAsync(serial, ct);
 
         int startX, startY, endX, endY;
 
         if (!string.IsNullOrEmpty(direction))
         {
-            // Get screen size for center-based swipe
-            var sizeResult = await RunAdbShellAsync(serial, "wm size", ct);
-            var sizeMatch = Regex.Match(sizeResult.StandardOutput, @"(\d+)x(\d+)");
-            int screenW = 1080, screenH = 1920;
-            if (sizeMatch.Success)
-            {
-                screenW = int.Parse(sizeMatch.Groups[1].Value);
-                screenH = int.Parse(sizeMatch.Groups[2].Value);
-            }
+            // Use visual screen dimensions for direction-based swipe
+            var (visW, visH) = GetVisualSize(physW, physH, rotation);
+            var cx = visW / 2;
+            var cy = visH / 2;
+            var swipeLen = Math.Min(visW, visH) / 3;
 
-            var cx = screenW / 2;
-            var cy = screenH / 2;
-            var swipeLen = Math.Min(screenW, screenH) / 3;
-
-            (startX, startY, endX, endY) = direction.ToLowerInvariant() switch
+            int vsx, vsy, vex, vey;
+            (vsx, vsy, vex, vey) = direction.ToLowerInvariant() switch
             {
                 "up" => (cx, cy + swipeLen, cx, cy - swipeLen),
                 "down" => (cx, cy - swipeLen, cx, cy + swipeLen),
@@ -735,13 +973,21 @@ public sealed class AdbToolHandler
                 "right" => (cx - swipeLen, cy, cx + swipeLen, cy),
                 _ => (cx, cy + swipeLen, cx, cy - swipeLen)
             };
+
+            // Transform visual to input coords
+            (startX, startY) = VisualToInput(vsx, vsy, rotation, physW, physH);
+            (endX, endY) = VisualToInput(vex, vey, rotation, physW, physH);
         }
         else
         {
-            startX = GetInt(args, "start_x", 0);
-            startY = GetInt(args, "start_y", 0);
-            endX = GetInt(args, "end_x", 0);
-            endY = GetInt(args, "end_y", 0);
+            // Transform visual coordinates to input coordinates
+            var vsx = GetInt(args, "start_x", 0);
+            var vsy = GetInt(args, "start_y", 0);
+            var vex = GetInt(args, "end_x", 0);
+            var vey = GetInt(args, "end_y", 0);
+
+            (startX, startY) = VisualToInput(vsx, vsy, rotation, physW, physH);
+            (endX, endY) = VisualToInput(vex, vey, rotation, physW, physH);
         }
 
         var result = await RunAdbShellAsync(serial,
@@ -751,6 +997,68 @@ public sealed class AdbToolHandler
             return ErrorResult($"Swipe failed: {result.StandardError}");
 
         return TextResult($"Swiped from ({startX},{startY}) to ({endX},{endY}) over {duration}ms");
+    }
+
+    private async Task<ToolCallResult> PinchAsync(JsonElement? args, CancellationToken ct)
+    {
+        var serial = await GetDeviceSerialAsync(args);
+        if (serial == null)
+            return ErrorResult("No device connected.");
+
+        var action = GetString(args, "action") ?? "zoom_in";
+        var scale = 0.25;
+        if (args?.TryGetProperty("scale", out var scaleVal) == true && scaleVal.ValueKind == JsonValueKind.Number)
+            scale = Math.Clamp(scaleVal.GetDouble(), 0.1, 0.5);
+        var durationMs = GetInt(args, "duration_ms", 500);
+
+        var rotation = await GetRotationAsync(serial, ct);
+        var (physW, physH) = await GetPhysicalSizeAsync(serial, ct);
+        var (visW, visH) = GetVisualSize(physW, physH, rotation);
+
+        // Default center
+        var cx = GetInt(args, "center_x", visW / 2);
+        var cy = GetInt(args, "center_y", visH / 2);
+
+        var offset = (int)(Math.Min(visW, visH) * scale);
+
+        int f1sx, f1sy, f1ex, f1ey; // finger 1
+        int f2sx, f2sy, f2ex, f2ey; // finger 2
+
+        if (action == "zoom_in")
+        {
+            // Fingers start close, move apart
+            f1sx = cx - 20; f1sy = cy - 20; f1ex = cx - offset; f1ey = cy - offset;
+            f2sx = cx + 20; f2sy = cy + 20; f2ex = cx + offset; f2ey = cy + offset;
+        }
+        else
+        {
+            // Fingers start apart, move together
+            f1sx = cx - offset; f1sy = cy - offset; f1ex = cx - 20; f1ey = cy - 20;
+            f2sx = cx + offset; f2sy = cy + offset; f2ex = cx + 20; f2ey = cy + 20;
+        }
+
+        // Transform to input coordinates
+        var (i1sx, i1sy) = VisualToInput(f1sx, f1sy, rotation, physW, physH);
+        var (i1ex, i1ey) = VisualToInput(f1ex, f1ey, rotation, physW, physH);
+        var (i2sx, i2sy) = VisualToInput(f2sx, f2sy, rotation, physW, physH);
+        var (i2ex, i2ey) = VisualToInput(f2ex, f2ey, rotation, physW, physH);
+
+        // Run two concurrent swipes to simulate pinch
+        // This works on many devices but is not a true multi-touch event
+        var pinchCmd = $"(input swipe {i1sx} {i1sy} {i1ex} {i1ey} {durationMs} &) ; " +
+                       $"input swipe {i2sx} {i2sy} {i2ex} {i2ey} {durationMs}";
+
+        var result = await RunAdbShellAsync(serial, pinchCmd, ct,
+            TimeSpan.FromSeconds(durationMs / 1000.0 + 5));
+
+        if (!result.Success)
+            return ErrorResult($"Pinch failed: {result.StandardError}");
+
+        return TextResult(
+            $"Pinch {action.Replace("_", " ")} at ({cx},{cy}) with scale {scale:F2}\n" +
+            $"Finger 1: ({f1sx},{f1sy}) → ({f1ex},{f1ey})\n" +
+            $"Finger 2: ({f2sx},{f2sy}) → ({f2ex},{f2ey})\n" +
+            "Note: Uses concurrent swipes. If pinch isn't recognized, try a larger scale value or slower duration.");
     }
 
     private async Task<ToolCallResult> InputTextAsync(JsonElement? args, CancellationToken ct)
@@ -763,23 +1071,52 @@ public sealed class AdbToolHandler
         if (string.IsNullOrEmpty(text))
             return ErrorResult("Missing required parameter: text");
 
-        // Escape special characters for ADB input text
-        var escaped = text.Replace("\\", "\\\\")
-                         .Replace(" ", "%s")
-                         .Replace("\"", "\\\"")
-                         .Replace("'", "\\'")
-                         .Replace("&", "\\&")
-                         .Replace("<", "\\<")
-                         .Replace(">", "\\>")
-                         .Replace(";", "\\;")
-                         .Replace("(", "\\(")
-                         .Replace(")", "\\)");
+        var useClipboard = GetBool(args, "use_clipboard", false);
 
-        var result = await RunAdbShellAsync(serial, $"input text \"{escaped}\"", ct);
-        if (!result.Success)
-            return ErrorResult($"Input text failed: {result.StandardError}");
+        if (!useClipboard)
+        {
+            // Try standard input first
+            var escaped = text.Replace("\\", "\\\\")
+                             .Replace(" ", "%s")
+                             .Replace("\"", "\\\"")
+                             .Replace("'", "\\'")
+                             .Replace("&", "\\&")
+                             .Replace("<", "\\<")
+                             .Replace(">", "\\>")
+                             .Replace(";", "\\;")
+                             .Replace("(", "\\(")
+                             .Replace(")", "\\)");
 
-        return TextResult($"Typed: {text}");
+            var result = await RunAdbShellAsync(serial, $"input text \"{escaped}\"", ct);
+            if (result.Success)
+                return TextResult($"Typed: {text}");
+
+            // Fall through to clipboard method if standard input failed
+        }
+
+        // Clipboard paste method: works with Flutter, React Native, WebView text fields
+        // 1. Set clipboard content via am broadcast
+        var clipEscaped = text.Replace("'", "'\\''");
+        var clipResult = await RunAdbShellAsync(serial,
+            $"am broadcast -a clipper.set -e text '{clipEscaped}' 2>/dev/null; " +
+            $"service call clipboard 2 i32 1 i64 0 s16 '{clipEscaped}' 2>/dev/null; " +
+            $"input keyevent 279 2>/dev/null",  // KEYCODE_PASTE (API 24+)
+            ct);
+
+        // Also try the content provider approach as fallback
+        if (!clipResult.Success || clipResult.StandardOutput.Contains("Error"))
+        {
+            // Alternative: use input text with broadcast receiver approach
+            await RunAdbShellAsync(serial,
+                $"am broadcast -a ADB_INPUT_TEXT --es msg '{clipEscaped}' 2>/dev/null", ct);
+        }
+
+        // Try paste via Ctrl+V keyevent combo
+        await RunAdbShellAsync(serial, "input keyevent 279", ct); // KEYCODE_PASTE
+
+        return TextResult($"Typed via clipboard paste: {text}\n" +
+            "Note: If text didn't appear, the app may not support clipboard paste. " +
+            "Try tapping the text field first, then calling input_text again.");
     }
 
     private async Task<ToolCallResult> PressKeyAsync(JsonElement? args, CancellationToken ct)
@@ -837,9 +1174,22 @@ public sealed class AdbToolHandler
         if (clickableOnly)
             elements = elements.Where(e => e.Clickable).ToList();
 
+        // Add rotation metadata
+        var rotation = await GetRotationAsync(serial, ct);
+        var (physW, physH) = await GetPhysicalSizeAsync(serial, ct);
+
+        var header = $"Orientation: {RotationLabel(rotation)} | Physical: {physW}x{physH}";
+        if (rotation != 0)
+        {
+            header += "\nNOTE: UI tree bounds are in the device's native coordinate system. " +
+                      "Use tap with text/content_desc/resource_id to tap elements reliably.";
+        }
+
         if (simplified)
         {
             var sb = new StringBuilder();
+            sb.AppendLine(header);
+            sb.AppendLine();
             foreach (var e in elements)
             {
                 if (string.IsNullOrEmpty(e.Text) && string.IsNullOrEmpty(e.ContentDesc) &&
@@ -864,8 +1214,7 @@ public sealed class AdbToolHandler
         }
         else
         {
-            // Return the raw XML
-            return TextResult(uiXml);
+            return TextResult($"{header}\n\n{uiXml}");
         }
     }
 
@@ -941,14 +1290,20 @@ public sealed class AdbToolHandler
                 props[label] = r.StandardOutput.Trim();
         }
 
-        // Screen size
+        // Screen size and rotation
         var sizeResult = await RunAdbShellAsync(serial, "wm size", ct);
         if (sizeResult.Success)
         {
             var match = Regex.Match(sizeResult.StandardOutput, @"(\d+)x(\d+)");
             if (match.Success)
-                props["Screen"] = $"{match.Groups[1].Value}x{match.Groups[2].Value}";
+                props["Physical Screen"] = $"{match.Groups[1].Value}x{match.Groups[2].Value}";
         }
+
+        var rotation = await GetRotationAsync(serial, ct);
+        var (pw, ph) = await GetPhysicalSizeAsync(serial, ct);
+        var (vw, vh) = GetVisualSize(pw, ph, rotation);
+        props["Rotation"] = $"{rotation} ({RotationLabel(rotation)})";
+        props["Visual Screen"] = $"{vw}x{vh}";
 
         // Density
         var densityResult = await RunAdbShellAsync(serial, "wm density", ct);
@@ -1113,25 +1468,50 @@ public sealed class AdbToolHandler
         if (x < 0 || y < 0)
             return ErrorResult("Missing required parameters: x, y");
 
-        // Take a screenshot and read the pixel
-        var (pngData, error) = await _screenshotService.CaptureAsync(serial, ct);
-        if (pngData == null)
-            return ErrorResult($"Screenshot for pixel sampling failed: {error}");
-
-        // Use the raw PNG data to extract pixel color
-        // We'll use a simple approach: decode the PNG header to get dimensions,
-        // then use the raw bitmap. For simplicity, save to temp, use ADB approach instead.
-        // Actually, let's use a shell approach with screencap raw format
+        // Use screencap in raw format and read the specific pixel
+        // Raw format: 4-byte width + 4-byte height + 4-byte pixel_format + RGBA pixel data
+        // Each pixel is 4 bytes (RGBA)
+        // This uses visual coordinates (same as screenshot) - no rotation transform needed
+        // because screencap captures in the current display orientation
         var result = await RunAdbShellAsync(serial,
-            $"screencap | head -c $((12 + ({y} * $(wm size | grep -o '[0-9]*x' | tr -d x) + {x} + 1) * 4)) | tail -c 4 | od -A n -t u1",
+            "screencap -p /sdcard/mcp_pixel_tmp.png && " +
+            $"dd if=/dev/urandom bs=1 count=0 2>/dev/null; " +  // no-op separator
+            "screencap | dd bs=4 count=1 2>/dev/null | od -A n -t u4 | tr -d ' '",
             ct);
 
-        if (result.Success && !string.IsNullOrWhiteSpace(result.StandardOutput))
+        // Better approach: use the raw screencap and compute the pixel offset
+        var widthResult = await RunAdbShellAsync(serial,
+            "screencap | head -c 4 | od -A n -t u4 | tr -d ' '", ct);
+        var rawWidth = 0;
+        if (widthResult.Success)
+            int.TryParse(widthResult.StandardOutput.Trim(), out rawWidth);
+
+        if (rawWidth <= 0)
         {
-            var values = result.StandardOutput.Trim().Split(
+            // Fallback: get width from wm size + rotation
+            var rotation = await GetRotationAsync(serial, ct);
+            var (physW, physH) = await GetPhysicalSizeAsync(serial, ct);
+            var (visW, _) = GetVisualSize(physW, physH, rotation);
+            rawWidth = visW;
+        }
+
+        if (rawWidth <= 0)
+            return ErrorResult("Could not determine screen width for pixel sampling.");
+
+        // Read the specific pixel: skip header (12 bytes) + pixel offset
+        // Pixel offset = (y * width + x) * 4 bytes per pixel
+        var pixelOffset = 12 + ((long)y * rawWidth + x) * 4;
+        var pixelResult = await RunAdbShellAsync(serial,
+            $"screencap | dd bs=1 skip={pixelOffset} count=4 2>/dev/null | od -A n -t u1",
+            ct);
+
+        if (pixelResult.Success && !string.IsNullOrWhiteSpace(pixelResult.StandardOutput))
+        {
+            var values = pixelResult.StandardOutput.Trim().Split(
                 (char[]?)null, StringSplitOptions.RemoveEmptyEntries);
             if (values.Length >= 3)
             {
+                // RGBA format
                 int r = int.Parse(values[0]);
                 int g = int.Parse(values[1]);
                 int b = int.Parse(values[2]);
@@ -1139,7 +1519,7 @@ public sealed class AdbToolHandler
                 var luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255.0;
 
                 return TextResult(
-                    $"Pixel ({x}, {y}):\n" +
+                    $"Pixel ({x}, {y}) — visual/screenshot coordinates:\n" +
                     $"  Hex: {hex}\n" +
                     $"  RGB: ({r}, {g}, {b})\n" +
                     $"  Luminance: {luminance:F3}\n" +
@@ -1147,8 +1527,10 @@ public sealed class AdbToolHandler
             }
         }
 
-        // Fallback: just report we couldn't read it
-        return ErrorResult("Could not read pixel color. The shell-based pixel extraction failed on this device.");
+        return ErrorResult(
+            $"Could not read pixel at ({x}, {y}). " +
+            $"Screen width detected: {rawWidth}. " +
+            "Make sure coordinates are within screen bounds.");
     }
 
     private async Task<ToolCallResult> PerformanceSnapshotAsync(JsonElement? args, CancellationToken ct)
@@ -1163,34 +1545,156 @@ public sealed class AdbToolHandler
 
         var sb = new StringBuilder();
         sb.AppendLine($"Performance snapshot for {package}:");
+        var hasData = false;
 
-        // GFX info (FPS, janky frames)
-        var gfxResult = await RunAdbShellAsync(serial, $"dumpsys gfxinfo {package}", ct, LongCommandTimeout);
-        if (gfxResult.Success)
+        // ── 1. GFX info (frame rendering stats) ──
+        var gfxResult = await RunAdbShellAsync(serial,
+            $"dumpsys gfxinfo {package} framestats", ct, LongCommandTimeout);
+        if (gfxResult.Success && !string.IsNullOrWhiteSpace(gfxResult.StandardOutput))
         {
-            var totalFramesMatch = Regex.Match(gfxResult.StandardOutput, @"Total frames rendered:\s*(\d+)");
-            var jankyMatch = Regex.Match(gfxResult.StandardOutput, @"Janky frames:\s*(\d+)\s*\(([^)]+)\)");
+            var gfx = gfxResult.StandardOutput;
+            sb.AppendLine("\n--- Frame Rendering ---");
 
-            if (totalFramesMatch.Success)
-                sb.AppendLine($"  Total frames: {totalFramesMatch.Groups[1].Value}");
-            if (jankyMatch.Success)
-                sb.AppendLine($"  Janky frames: {jankyMatch.Groups[1].Value} ({jankyMatch.Groups[2].Value})");
+            // Try multiple regex patterns for different Android versions
+            var totalFrames = Regex.Match(gfx, @"Total frames rendered:\s*(\d+)");
+            var jankyFrames = Regex.Match(gfx, @"Janky frames:\s*(\d+)\s*\(([^)]+)\)");
+            var p50 = Regex.Match(gfx, @"50th percentile:\s*(\d+)ms");
+            var p90 = Regex.Match(gfx, @"90th percentile:\s*(\d+)ms");
+            var p95 = Regex.Match(gfx, @"95th percentile:\s*(\d+)ms");
+            var p99 = Regex.Match(gfx, @"99th percentile:\s*(\d+)ms");
+            var missedVsync = Regex.Match(gfx, @"Number Missed Vsync:\s*(\d+)");
+            var highInputLat = Regex.Match(gfx, @"Number High input latency:\s*(\d+)");
+            var slowUiThread = Regex.Match(gfx, @"Number Slow UI thread:\s*(\d+)");
+            var slowBitmapUploads = Regex.Match(gfx, @"Number Slow bitmap uploads:\s*(\d+)");
+            var slowIssue = Regex.Match(gfx, @"Number Slow issue draw commands:\s*(\d+)");
+
+            if (totalFrames.Success) { sb.AppendLine($"  Total frames: {totalFrames.Groups[1].Value}"); hasData = true; }
+            if (jankyFrames.Success) { sb.AppendLine($"  Janky frames: {jankyFrames.Groups[1].Value} ({jankyFrames.Groups[2].Value})"); hasData = true; }
+            if (p50.Success) sb.AppendLine($"  50th percentile: {p50.Groups[1].Value}ms");
+            if (p90.Success) sb.AppendLine($"  90th percentile: {p90.Groups[1].Value}ms");
+            if (p95.Success) sb.AppendLine($"  95th percentile: {p95.Groups[1].Value}ms");
+            if (p99.Success) sb.AppendLine($"  99th percentile: {p99.Groups[1].Value}ms");
+            if (missedVsync.Success) sb.AppendLine($"  Missed Vsync: {missedVsync.Groups[1].Value}");
+            if (highInputLat.Success) sb.AppendLine($"  High input latency: {highInputLat.Groups[1].Value}");
+            if (slowUiThread.Success) sb.AppendLine($"  Slow UI thread: {slowUiThread.Groups[1].Value}");
+            if (slowBitmapUploads.Success) sb.AppendLine($"  Slow bitmap uploads: {slowBitmapUploads.Groups[1].Value}");
+            if (slowIssue.Success) sb.AppendLine($"  Slow draw commands: {slowIssue.Groups[1].Value}");
+
+            // If none of the above matched, dump raw stats section
+            if (!totalFrames.Success && !jankyFrames.Success)
+            {
+                // Look for the stats section
+                var statsSection = Regex.Match(gfx, @"(Stats since.*?)(?:\n\n|\z)", RegexOptions.Singleline);
+                if (statsSection.Success)
+                {
+                    sb.AppendLine(statsSection.Groups[1].Value.Trim());
+                    hasData = true;
+                }
+            }
         }
 
-        // Memory info
-        var memResult = await RunAdbShellAsync(serial, $"dumpsys meminfo {package}", ct, LongCommandTimeout);
-        if (memResult.Success)
+        // ── 2. Memory info ──
+        var memResult = await RunAdbShellAsync(serial,
+            $"dumpsys meminfo {package}", ct, LongCommandTimeout);
+        if (memResult.Success && !string.IsNullOrWhiteSpace(memResult.StandardOutput))
         {
-            var totalMatch = Regex.Match(memResult.StandardOutput, @"TOTAL\s+(\d+)");
-            var nativeMatch = Regex.Match(memResult.StandardOutput, @"Native Heap\s+(\d+)");
-            var javaMatch = Regex.Match(memResult.StandardOutput, @"Java Heap\s+(\d+)");
+            sb.AppendLine("\n--- Memory ---");
+            var mem = memResult.StandardOutput;
 
-            if (totalMatch.Success)
-                sb.AppendLine($"  Total memory: {int.Parse(totalMatch.Groups[1].Value) / 1024}MB");
-            if (nativeMatch.Success)
-                sb.AppendLine($"  Native heap: {int.Parse(nativeMatch.Groups[1].Value) / 1024}MB");
-            if (javaMatch.Success)
-                sb.AppendLine($"  Java heap: {int.Parse(javaMatch.Groups[1].Value) / 1024}MB");
+            // Try multiple patterns for different Android versions
+            var totalPss = Regex.Match(mem, @"TOTAL\s+PSS:\s+(\d+)", RegexOptions.IgnoreCase);
+            if (!totalPss.Success) totalPss = Regex.Match(mem, @"TOTAL\s+(\d+)");
+
+            var nativeHeap = Regex.Match(mem, @"Native Heap\s+(\d+)");
+            var javaHeap = Regex.Match(mem, @"(?:Dalvik|Java) Heap\s+(\d+)");
+            var totalSwapPss = Regex.Match(mem, @"TOTAL SWAP PSS:\s+(\d+)");
+
+            // Also try the "App Summary" section (newer Android)
+            var appSummary = Regex.Match(mem, @"App Summary\s*\n(.*?)(?:\n\s*\n|\z)", RegexOptions.Singleline);
+
+            if (totalPss.Success)
+            {
+                var totalKb = int.Parse(totalPss.Groups[1].Value);
+                sb.AppendLine($"  Total PSS: {totalKb / 1024}MB ({totalKb}KB)");
+                hasData = true;
+            }
+            if (nativeHeap.Success)
+                sb.AppendLine($"  Native heap: {int.Parse(nativeHeap.Groups[1].Value) / 1024}MB");
+            if (javaHeap.Success)
+                sb.AppendLine($"  Java/Dalvik heap: {int.Parse(javaHeap.Groups[1].Value) / 1024}MB");
+            if (totalSwapPss.Success)
+                sb.AppendLine($"  Swap PSS: {int.Parse(totalSwapPss.Groups[1].Value) / 1024}MB");
+
+            if (appSummary.Success && !totalPss.Success)
+            {
+                sb.AppendLine(appSummary.Groups[1].Value.Trim());
+                hasData = true;
+            }
+
+            // Fallback: extract the TOTAL line directly
+            if (!totalPss.Success && !appSummary.Success)
+            {
+                var totalLine = mem.Split('\n')
+                    .FirstOrDefault(l => l.TrimStart().StartsWith("TOTAL"));
+                if (totalLine != null)
+                {
+                    sb.AppendLine($"  {totalLine.Trim()}");
+                    hasData = true;
+                }
+            }
+        }
+
+        // ── 3. CPU usage ──
+        var cpuResult = await RunAdbShellAsync(serial,
+            $"top -b -n 1 -p $(pidof {package} 2>/dev/null || echo 0) 2>/dev/null | tail -2",
+            ct);
+        if (cpuResult.Success && !string.IsNullOrWhiteSpace(cpuResult.StandardOutput))
+        {
+            var cpuLines = cpuResult.StandardOutput.Split('\n')
+                .Where(l => l.Contains(package, StringComparison.OrdinalIgnoreCase) ||
+                            Regex.IsMatch(l, @"^\s*\d+"))
+                .ToList();
+            if (cpuLines.Count > 0)
+            {
+                sb.AppendLine("\n--- CPU ---");
+                foreach (var line in cpuLines)
+                    sb.AppendLine($"  {line.Trim()}");
+                hasData = true;
+            }
+        }
+
+        // Fallback CPU: use dumpsys cpuinfo
+        if (!hasData || !sb.ToString().Contains("CPU"))
+        {
+            var cpuInfo = await RunAdbShellAsync(serial,
+                $"dumpsys cpuinfo | grep -i '{package}'", ct);
+            if (cpuInfo.Success && !string.IsNullOrWhiteSpace(cpuInfo.StandardOutput))
+            {
+                sb.AppendLine("\n--- CPU (dumpsys) ---");
+                sb.AppendLine($"  {cpuInfo.StandardOutput.Trim()}");
+                hasData = true;
+            }
+        }
+
+        // ── 4. GPU rendering mode (if available) ──
+        var gpuResult = await RunAdbShellAsync(serial,
+            "dumpsys gpu | head -20 2>/dev/null", ct);
+        if (gpuResult.Success && !string.IsNullOrWhiteSpace(gpuResult.StandardOutput)
+            && !gpuResult.StandardOutput.Contains("not found"))
+        {
+            sb.AppendLine("\n--- GPU ---");
+            sb.AppendLine($"  {gpuResult.StandardOutput.Trim()}");
+            hasData = true;
+        }
+
+        if (!hasData)
+        {
+            sb.AppendLine("\nNo performance data could be collected.");
+            sb.AppendLine("Possible reasons:");
+            sb.AppendLine("  - App uses Flutter/React Native (bypasses Android rendering pipeline for gfxinfo)");
+            sb.AppendLine("  - App is not currently running (use launch_app first)");
+            sb.AppendLine("  - Try: shell command='dumpsys gfxinfo " + package + "' to see raw output");
+            sb.AppendLine("  - Try: shell command='dumpsys meminfo " + package + "' for memory details");
         }
 
         return TextResult(sb.ToString().TrimEnd());
